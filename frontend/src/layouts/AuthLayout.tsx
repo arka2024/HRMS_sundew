@@ -1,0 +1,7 @@
+export function AuthLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="auth-layout">
+      <div className="auth-card">{children}</div>
+    </div>
+  );
+}

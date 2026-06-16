@@ -1,0 +1,28 @@
+{
+  "name": "hrms-rbac-system",
+  "version": "2.0.0",
+  "description": "Enterprise HRMS with single frontend and microservice backends",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/start-all.js",
+    "install:all": "npm install && npm run install:backends && npm run install:frontend",
+    "install:backends": "npm install --prefix backend/auth-service && npm install --prefix backend/hr-service && npm install --prefix backend/manager-service && npm install --prefix backend/report-service",
+    "install:frontend": "npm install --prefix frontend",
+    "dev": "node scripts/start-all.js"
+  },
+  "keywords": [
+    "HRMS",
+    "Authentication",
+    "RBAC",
+    "Microservices"
+  ],
+  "author": "Sundew HRMS Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}

@@ -1,0 +1,164 @@
+[
+  {
+    "id": "sarah-chen",
+    "name": "Sarah Chen",
+    "employeeId": "HR-2024-001",
+    "joinDate": "Jan 15, 2024",
+    "manager": "Sarah Thompson",
+    "probation": "Month 3/4",
+    "status": "On Track",
+    "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuDwipckJtsRT5jNcB8fC-YO9nro0-sHfX5b-wHB0PiDgmggS0rEbG1ibzJBPRomUWqEOSwX1RT6nyzNG8eA5jikqUWz5r6529vATPHcNd1x5l3oHRDG_eKPube8i5Cwk1Ixe_TUiO22aMsiLNw7oBgQ8eOBU9yYGE5aA8H2Bxx9pxOezlYEl2gvHaJgU3CYmVPao6JXvxzFzrq9w__LPY6DIyomULj_58TZz4Dgnpc7kuhU15ymf8o0HZ4W9UGoyG1eGdLtadBtNpY",
+    "project": {
+      "name": "Enterprise HR Portal Redesign",
+      "phase": "Development",
+      "progress": 65,
+      "status": "Healthy"
+    },
+    "history": [
+      {
+        "month": "Jan",
+        "tech": 2,
+        "learn": 2,
+        "adapt": 3,
+        "attitude": 4,
+        "comments": "Onboarding completed successfully. Good base.",
+        "average": 2.75
+      },
+      {
+        "month": "Feb",
+        "tech": 2.5,
+        "learn": 4,
+        "adapt": 3,
+        "attitude": 4,
+        "comments": "Excellent learning speed, very adaptable to project requirements.",
+        "average": 3.375
+      },
+      {
+        "month": "Mar",
+        "tech": 4,
+        "learn": 4,
+        "adapt": 4.5,
+        "attitude": 4,
+        "comments": "Solid progress in development speed and code quality.",
+        "average": 4.125
+      }
+    ],
+    "currentEvaluation": {
+      "tech": 3,
+      "learn": 3,
+      "adapt": 3,
+      "attitude": 3,
+      "comments": "Sarah has shown steady improvement. We are on track to pass probation."
+    }
+  },
+  {
+    "id": "marcus-thorne",
+    "name": "Marcus Thorne",
+    "employeeId": "HR-2024-002",
+    "joinDate": "Feb 1, 2024",
+    "manager": "Sarah Thompson",
+    "probation": "Month 2/4",
+    "status": "On Track",
+    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200",
+    "project": {
+      "name": "Cloud Migration",
+      "phase": "Testing & Deployment",
+      "progress": 40,
+      "status": "At Risk"
+    },
+    "history": [
+      {
+        "month": "Feb",
+        "tech": 2,
+        "learn": 3,
+        "adapt": 2,
+        "attitude": 3,
+        "comments": "Needs assistance with infrastructure scripting.",
+        "average": 2.5
+      }
+    ],
+    "currentEvaluation": {
+      "tech": 2,
+      "learn": 3,
+      "adapt": 2,
+      "attitude": 3,
+      "comments": "Struggling to adapt to complex system setups. Coaching scheduled."
+    }
+  },
+  {
+    "id": "elena-rodriguez",
+    "name": "Elena Rodriguez",
+    "employeeId": "HR-2024-003",
+    "joinDate": "Mar 10, 2024",
+    "manager": "Marcus Vance",
+    "probation": "Month 1/4",
+    "status": "On Track",
+    "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200",
+    "project": {
+      "name": "Mobile App Dev",
+      "phase": "Planning & Design",
+      "progress": 15,
+      "status": "Healthy"
+    },
+    "history": [],
+    "currentEvaluation": {
+      "tech": 4,
+      "learn": 4,
+      "adapt": 4,
+      "attitude": 5,
+      "comments": "Outstanding initial month. Already delivering clean components."
+    }
+  },
+  {
+    "id": "james-wilson",
+    "name": "James Wilson",
+    "employeeId": "HR-2024-004",
+    "joinDate": "Nov 12, 2023",
+    "manager": "Elena Vance",
+    "probation": "Month 4/4",
+    "status": "On Track",
+    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
+    "project": {
+      "name": "Security Audit",
+      "phase": "Final Review",
+      "progress": 90,
+      "status": "Healthy"
+    },
+    "history": [
+      {
+        "month": "Nov",
+        "tech": 3.5,
+        "learn": 3.5,
+        "adapt": 3,
+        "attitude": 4,
+        "comments": "Initial evaluation went smoothly.",
+        "average": 3.5
+      },
+      {
+        "month": "Dec",
+        "tech": 4,
+        "learn": 4,
+        "adapt": 4,
+        "attitude": 4,
+        "comments": "Strong audit logs produced.",
+        "average": 4
+      },
+      {
+        "month": "Jan",
+        "tech": 4.5,
+        "learn": 4,
+        "adapt": 4.5,
+        "attitude": 4.5,
+        "comments": "Highly independent. High contribution.",
+        "average": 4.375
+      }
+    ],
+    "currentEvaluation": {
+      "tech": 5,
+      "learn": 4,
+      "adapt": 5,
+      "attitude": 5,
+      "comments": "Excellent compliance work. Strongly recommended to hire permanently."
+    }
+  }
+]

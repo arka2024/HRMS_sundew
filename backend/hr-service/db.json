@@ -1,0 +1,23 @@
+{
+  "documents": [
+    { "id": "doc-001", "name": "Employee Handbook 2024.pdf", "type": "PDF Document", "dateAdded": "Oct 12, 2023", "owner": "Sarah Thompson", "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuCCEBSgyvWhWcUFD0_sFk0Z5fn365kbumbRqrv0GfIZuJzhpIr_eUJNWeIBGOl3ilIv7K2R5i4SFlgLPUmMLkSojNB61S0Y-tspj1SNDCxbSMr327OASz9b24mdOjMqUvq2GKMtN4H5b8Se1gxiKRGOkQKZgNqW7QE59DYjL4guWRIGz4azjNWxeGTr8iJBEJBzwMmY-49ETYtOTynhsY_SqQ6vOxPyxzNOP3VZLhi8Skrjr1D3s7TyorKUMJf9YiCbHAmFsV07M9c" },
+    { "id": "doc-002", "name": "Contract_Template_Remote.docx", "type": "MS Word", "dateAdded": "Sep 28, 2023", "owner": "Mark Wilson", "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200" },
+    { "id": "doc-003", "name": "Q4 Policy Updates.pdf", "type": "PDF Document", "dateAdded": "Sep 15, 2023", "owner": "Sarah Thompson", "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuCCEBSgyvWhWcUFD0_sFk0Z5fn365kbumbRqrv0GfIZuJzhpIr_eUJNWeIBGOl3ilIv7K2R5i4SFlgLPUmMLkSojNB61S0Y-tspj1SNDCxbSMr327OASz9b24mdOjMqUvq2GKMtN4H5b8Se1gxiKRGOkQKZgNqW7QE59DYjL4guWRIGz4azjNWxeGTr8iJBEJBzwMmY-49ETYtOTynhsY_SqQ6vOxPyxzNOP3VZLhi8Skrjr1D3s7TyorKUMJf9YiCbHAmFsV07M9c" },
+    { "id": "doc-004", "name": "Salary_Bands_2024_Global.xlsx", "type": "MS Excel", "dateAdded": "Aug 30, 2023", "owner": "Jane Hunter", "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200" }
+  ],
+  "activities": [
+    { "id": "act-001", "user": "Sarah Thompson", "action": "updated", "target": "Policy_2024.v2", "time": "2 hours ago" },
+    { "id": "act-002", "user": "David Lee", "action": "downloaded 14 contracts", "target": "from Legal Archives", "time": "5 hours ago" },
+    { "id": "act-003", "user": "HR System", "action": "received new hire packets", "target": "for 3 Employees", "time": "Yesterday" },
+    { "id": "act-004", "user": "System Admin", "action": "deleted archive", "target": "Old_Benefits_Guide_2019", "time": "2 days ago" }
+  ],
+  "storage": {
+    "used": 12.4,
+    "limit": 50,
+    "documentsCount": 842,
+    "mediaCount": 156,
+    "legal": 4.2,
+    "policies": 3.1,
+    "records": 5.1
+  }
+}

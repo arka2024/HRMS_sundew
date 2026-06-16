@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Manager Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        }
+        .sidebar-item.active {
+            background-color: #4F46E5;
+            color: white;
+        }
+        .sidebar-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .sidebar-item:hover {
+            background-color: #F3F4F6;
+        }
+        .sidebar-item.active:hover {
+            background-color: #4F46E5;
+        }
+        .file-upload-zone {
+            border: 2px dashed #D1D5DB;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .file-upload-zone:hover {
+            border-color: #4F46E5;
+            background-color: #F8F9FF;
+        }
+        .file-upload-zone.dragover {
+            border-color: #4F46E5;
+            background-color: #EEF2FF;
+        }
+
+        :root {
+            --hr-bg: #f4f7fb;
+            --hr-ink: #091426;
+            --hr-blue: #0756c5;
+            --hr-border: #d1d8e3;
+            --hr-muted: #536070;
+        }
+
+        body {
+            background: var(--hr-bg);
+            color: var(--hr-ink);
+            letter-spacing: 0;
+        }
+
+        .material-symbols-outlined {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            vertical-align: middle;
+        }
+
+        .bg-white {
+            background-color: #fff;
+        }
+
+        .border-gray-200,
+        .border-gray-100 {
+            border-color: var(--hr-border) !important;
+        }
+
+        .rounded-lg {
+            border-radius: 8px !important;
+        }
+
+        .shadow-card {
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 28px rgba(15, 23, 42, 0.05);
+        }
+
+        .sidebar-item {
+            min-height: 44px;
+            border: 1px solid transparent;
+        }
+
+        .sidebar-item.active {
+            background-color: #2774e8;
+            color: white;
+            border-color: #1765da;
+        }
+
+        .sidebar-item:hover {
+            background-color: #e9eef6;
+        }
+
+        .sidebar-item.active:hover {
+            background-color: #2774e8;
+        }
+
+        .file-upload-zone {
+            border-color: #c9d1dd;
+            background: #ffffff;
+            min-height: 210px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .file-upload-zone svg {
+            background: #e6ebf2;
+            border-radius: 14px;
+            padding: 14px;
+            color: var(--hr-ink);
+        }
+
+        table thead {
+            background: #eef2f7;
+        }
+
+        table tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        .hr-card {
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 28px rgba(15, 23, 42, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900" onload="enforceHRAccess()">
+    <div class="flex flex-col h-screen">
+        <!-- Navigation Bar -->
+        <div class="bg-white border-b border-gray-200 sticky top-0 z-40">
+            <div class="flex items-center justify-between px-6 py-4">
+                <h1 class="text-xl font-semibold text-gray-800">HR Manager Portal</h1>
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Search documents..." class="px-4 py-2 bg-gray-100 rounded-lg w-64 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <span class="material-symbols-outlined absolute right-3 top-2.5 text-gray-400">search</span>
+                    </div>
+                    <button class="p-2 hover:bg-gray-100 rounded-lg">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                    <button class="p-2 hover:bg-gray-100 rounded-lg">
+                        <span class="material-symbols-outlined">settings</span>
+                    </button>
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer">ET</div>
+                </div>
+            </div>
+            
+            <!-- Sub Navigation -->
+            <div class="bg-gray-50 border-t border-gray-200 px-6">
+                <div class="flex gap-8">
+                    <button class="px-4 py-3 text-sm font-medium text-gray-700 border-b-2 border-blue-500 text-blue-600">Dashboard</button>
+                    <button class="px-4 py-3 text-sm font-medium text-gray-600 hover:text-gray-900">Team</button>
+                    <button class="px-4 py-3 text-sm font-medium text-gray-600 hover:text-gray-900">Evaluations</button>
+                    <button class="px-4 py-3 text-sm font-medium text-gray-600 hover:text-gray-900">Reports</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Sidebar -->
+            <div class="w-48 bg-white border-r border-gray-200 p-4 overflow-y-auto">
+                <div class="mb-8 pb-6 border-b border-gray-200">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white">
+                            <span class="material-symbols-outlined text-lg">business</span>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-gray-900">Corporate HR</h2>
+                            <p class="text-xs text-gray-500">ENTERPRISE EDITION</p>
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="space-y-2">
+                    <div class="sidebar-item active px-4 py-3 rounded-lg flex items-center gap-3">
+                        <span class="material-symbols-outlined text-lg">folder</span>
+                        <span class="text-sm font-medium">Files</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg flex items-center gap-3 text-gray-700">
+                        <span class="material-symbols-outlined text-lg">people</span>
+                        <span class="text-sm font-medium">Directory</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg flex items-center gap-3 text-gray-700">
+                        <span class="material-symbols-outlined text-lg">trending_up</span>
+                        <span class="text-sm font-medium">Performance</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg flex items-center gap-3 text-gray-700">
+                        <span class="material-symbols-outlined text-lg">schedule</span>
+                        <span class="text-sm font-medium">Time Off</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg flex items-center gap-3 text-gray-700">
+                        <span class="material-symbols-outlined text-lg">payments</span>
+                        <span class="text-sm font-medium">Payroll</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg flex items-center gap-3 text-gray-700">
+                        <span class="material-symbols-outlined text-lg">person_add</span>
+                        <span class="text-sm font-medium">Hiring</span>
+                    </div>
+                </nav>
+
+                <div class="absolute bottom-6 left-4 right-4 space-y-3">
+                    <button class="w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">add</span>
+                        New Evaluation
+                    </button>
+                    <div class="pt-3 border-t border-gray-200 space-y-2">
+                        <button class="w-full text-left px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 rounded flex items-center gap-3">
+                            <span class="material-symbols-outlined text-lg">help</span>
+                            Help Center
+                        </button>
+                        <button class="w-full text-left px-4 py-2 text-gray-700 text-sm hover:bg-gray-100 rounded flex items-center gap-3" onclick="logout()">
+                            <span class="material-symbols-outlined text-lg">logout</span>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 overflow-y-auto p-8 bg-gray-50">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Document Management</h2>
+                    <p class="text-gray-600">Manage organization policies, contracts, and employee handbooks.</p>
+                </div>
+
+                <div class="grid grid-cols-3 gap-8">
+                    <div class="col-span-2 space-y-6">
+                        <div class="bg-white rounded-lg border border-gray-200 p-8 hr-card">
+                            <div class="file-upload-zone">
+                                <div class="mb-4">
+                                    <svg class="mx-auto w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Drop files here to upload</h3>
+                                <p class="text-sm text-gray-600">or <a href="#" class="text-blue-600 hover:underline">browse your computer</a> (Max 50MB per file)</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg border border-gray-200 p-6 hr-card">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-semibold text-gray-900">Recent Documents</h3>
+                                <div class="flex gap-2">
+                                    <button class="p-2 hover:bg-gray-100 rounded">
+                                        <span class="material-symbols-outlined">view_list</span>
+                                    </button>
+                                    <button class="p-2 hover:bg-gray-100 rounded">
+                                        <span class="material-symbols-outlined">view_comfy</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead class="border-b border-gray-200">
+                                        <tr class="text-gray-600 font-semibold">
+                                            <th class="text-left py-3 px-4">NAME</th>
+                                            <th class="text-left py-3 px-4">TYPE</th>
+                                            <th class="text-left py-3 px-4">DATE ADDED</th>
+                                            <th class="text-left py-3 px-4">OWNER</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                            <td class="py-4 px-4"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-red-500">picture_as_pdf</span><span class="font-medium text-gray-900">Employee Handbook 2024.pdf</span></div></td>
+                                            <td class="py-4 px-4 text-gray-600">PDF Document</td>
+                                            <td class="py-4 px-4 text-gray-600">Oct 12, 2023</td>
+                                            <td class="py-4 px-4"><div class="flex items-center gap-2"><div class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">EA</div><span class="text-gray-900">Elena A</span></div></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+                                <span class="text-sm text-gray-600">Showing 4 of 128 documents</span>
+                                <div class="flex gap-2">
+                                    <button class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded">Previous</button>
+                                    <button class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded">Next</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-lg border border-gray-200 p-6 hr-card">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-6">Storage Statistics</h3>
+                            <div class="mb-6">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-medium text-gray-700">Total Used</span>
+                                    <span class="text-sm font-semibold text-gray-900">12.4 GB / 50 GB</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 25%"></div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 bg-blue-600 rounded-full"></div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Documents</p>
+                                        <p class="text-xs text-gray-500">842</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 bg-green-600 rounded-full"></div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-700">Media</p>
+                                        <p class="text-xs text-gray-500">156</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 pt-6 border-t border-gray-200 space-y-3 text-sm">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">Legal & Contracts</span>
+                                    <span class="text-gray-900 font-medium">(4.2 GB)</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">Internal Policies</span>
+                                    <span class="text-gray-900 font-medium">(3.1 GB)</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">Employee Records</span>
+                                    <span class="text-gray-900 font-medium">(5.1 GB)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg border border-gray-200 p-6 hr-card">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-6">Recent Activity</h3>
+                            <div class="space-y-4">
+                                <div class="flex gap-3">
+                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                        <span class="material-symbols-outlined text-green-600 text-sm">check</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Sarah Thompson updated<br><span class="text-xs text-gray-500">Policy_2024_v2</span></p>
+                                        <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="w-full mt-6 pt-4 border-t border-gray-200 text-blue-600 text-sm font-medium hover:text-blue-700 text-center">View Full Audit Log</button>
+                        </div>
+
+                        <div class="bg-blue-900 rounded-lg p-6 text-white">
+                            <h3 class="text-lg font-semibold mb-2">Secure E-Signatures</h3>
+                            <p class="text-sm text-blue-200 mb-4">Integrate digital signatures directly into your documents workflow.</p>
+                            <button class="bg-white text-blue-900 px-4 py-2 rounded font-medium text-sm hover:bg-blue-50">Learn More</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../auth-service.js"></script>
+    <script src="../route-protection.js"></script>
+
+    <script>
+        function enforceHRAccess() {
+            const user = authService.getCurrentUser();
+            if (!user) {
+                window.location.href = '/login.html';
+                return;
+            }
+            if (user.role !== 'hr') {
+                const homeUrl = routeProtection.getHomeDashboard(user.role);
+                window.location.href = homeUrl;
+                return;
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to sign out?')) {
+                authService.logout();
+                window.location.href = '/login.html';
+            }
+        }
+
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
