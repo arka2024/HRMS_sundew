@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
@@ -8,6 +8,7 @@ import { Card } from '../../components/Card';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
 import { useAuth } from '../../contexts/AuthContext';
+import { useEmployeeSyncRefresh } from '../../hooks/useEmployeeSyncRefresh';
 import { managerService, type Associate } from '../../services/manager.service';
 import { ROUTES } from '../../constants';
 
@@ -19,11 +20,12 @@ export function ManagerTeamPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  function loadTeam() {
+  const loadTeam = useCallback(() => {
+    if (!token) return;
     setIsLoading(true);
     setError(null);
     managerService
-      .getAssociates(token!)
+      .getAssociates(token)
       .then((data) => {
         setAssociates(data);
         setIsLoading(false);
@@ -33,14 +35,9 @@ export function ManagerTeamPage() {
         setError('Failed to connect to Manager Service backend.');
         setIsLoading(false);
       });
-  }
-
-  useEffect(() => {
-    if (token) {
-      loadTeam();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  useEmployeeSyncRefresh(loadTeam, { enabled: Boolean(token), intervalMs: 15000 });
 
   async function handleDelete(id: string, name: string) {
     if (!confirm(`Are you sure you want to delete ${name}'s probation record? This action is permanent.`)) {

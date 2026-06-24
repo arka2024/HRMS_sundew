@@ -19,6 +19,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<string>;
+  register: (name: string, email: string, password: string, role: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -78,6 +79,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const register = useCallback(async (name: string, email: string, password: string, role: string) => {
+    try {
+      const response = await authService.register(name, email, password, role);
+      authService.persistSession(response.user, response.token);
+      setUser(response.user);
+      setToken(response.token);
+      toast.success('Account created successfully! Please login.');
+    } catch (error) {
+      const message =
+        error instanceof ApiClientError ? error.message : 'Registration failed. Please try again.';
+      toast.error(message);
+      throw error;
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     if (token) {
       try {
@@ -100,9 +116,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: Boolean(user && token),
       isLoading,
       login,
+      register,
       logout,
     }),
-    [user, token, isLoading, login, logout],
+    [user, token, isLoading, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

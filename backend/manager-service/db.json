@@ -1,46 +1,38 @@
 [
   {
-    "id": "sarah-chen",
-    "name": "Sarah Chen",
-    "employeeId": "HR-2024-001",
-    "joinDate": "Jan 15, 2024",
-    "manager": "Sarah Thompson",
-    "probation": "Month 3/4",
+    "id": "aishik-maitra",
+    "name": "Aishik Maitra",
+    "employeeId": "SDS250",
+    "joinDate": "May 27, 2026",
+    "manager": "Demo Manager",
+    "probationDurationMonths": 4,
+    "probationEndDate": "Sep 27, 2026",
+    "probation": "Month 1/4",
     "status": "On Track",
-    "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuDwipckJtsRT5jNcB8fC-YO9nro0-sHfX5b-wHB0PiDgmggS0rEbG1ibzJBPRomUWqEOSwX1RT6nyzNG8eA5jikqUWz5r6529vATPHcNd1x5l3oHRDG_eKPube8i5Cwk1Ixe_TUiO22aMsiLNw7oBgQ8eOBU9yYGE5aA8H2Bxx9pxOezlYEl2gvHaJgU3CYmVPao6JXvxzFzrq9w__LPY6DIyomULj_58TZz4Dgnpc7kuhU15ymf8o0HZ4W9UGoyG1eGdLtadBtNpY",
+    "avatar": "https://ui-avatars.com/api/?name=Aishik%20Maitra&background=0044ff&color=fff",
     "project": {
-      "name": "Enterprise HR Portal Redesign",
-      "phase": "Development",
-      "progress": 65,
+      "name": "ASMBEL 2.0",
+      "phase": "Analytics & Automation",
+      "progress": 75,
       "status": "Healthy"
     },
+    "department": "Analytics & Automation",
+    "totalHoursWorked": 6,
     "history": [
       {
-        "month": "Jan",
-        "tech": 2,
-        "learn": 2,
+        "month": "Jun",
+        "monthKey": "2026-06",
+        "tech": 3,
+        "learn": 3,
         "adapt": 3,
-        "attitude": 4,
-        "comments": "Onboarding completed successfully. Good base.",
-        "average": 2.75
-      },
-      {
-        "month": "Feb",
-        "tech": 2.5,
-        "learn": 4,
-        "adapt": 3,
-        "attitude": 4,
-        "comments": "Excellent learning speed, very adaptable to project requirements.",
-        "average": 3.375
-      },
-      {
-        "month": "Mar",
-        "tech": 4,
-        "learn": 4,
-        "adapt": 4.5,
-        "attitude": 4,
-        "comments": "Solid progress in development speed and code quality.",
-        "average": 4.125
+        "attitude": 3,
+        "comments": "",
+        "average": 3,
+        "savedAt": "2026-06-22T08:25:00.370Z",
+        "locked": true,
+        "status": "Locked",
+        "lockedBy": "Demo Manager",
+        "lockedDate": "2026-06-22T08:25:00.370Z"
       }
     ],
     "currentEvaluation": {
@@ -48,117 +40,307 @@
       "learn": 3,
       "adapt": 3,
       "attitude": 3,
-      "comments": "Sarah has shown steady improvement. We are on track to pass probation."
-    }
-  },
-  {
-    "id": "marcus-thorne",
-    "name": "Marcus Thorne",
-    "employeeId": "HR-2024-002",
-    "joinDate": "Feb 1, 2024",
-    "manager": "Sarah Thompson",
-    "probation": "Month 2/4",
-    "status": "On Track",
-    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200",
-    "project": {
-      "name": "Cloud Migration",
-      "phase": "Testing & Deployment",
-      "progress": 40,
-      "status": "At Risk"
+      "comments": ""
     },
-    "history": [
-      {
-        "month": "Feb",
-        "tech": 2,
-        "learn": 3,
-        "adapt": 2,
-        "attitude": 3,
-        "comments": "Needs assistance with infrastructure scripting.",
-        "average": 2.5
-      }
-    ],
-    "currentEvaluation": {
-      "tech": 2,
-      "learn": 3,
-      "adapt": 2,
-      "attitude": 3,
-      "comments": "Struggling to adapt to complex system setups. Coaching scheduled."
-    }
+    "syncedFromHr": true,
+    "averagePerformanceScore": 3,
+    "evaluationLockedForMonth": "2026-06"
   },
   {
-    "id": "elena-rodriguez",
-    "name": "Elena Rodriguez",
-    "employeeId": "HR-2024-003",
-    "joinDate": "Mar 10, 2024",
-    "manager": "Marcus Vance",
+    "id": "arunabha-talukdar",
+    "name": "Arunabha Talukdar",
+    "employeeId": "SDS254",
+    "joinDate": "May 26, 2026",
+    "manager": "Demo Manager",
+    "probationDurationMonths": 4,
+    "probationEndDate": "Sep 26, 2026",
     "probation": "Month 1/4",
     "status": "On Track",
-    "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200",
+    "avatar": "https://ui-avatars.com/api/?name=Arunabha%20Talukdar&background=0044ff&color=fff",
     "project": {
-      "name": "Mobile App Dev",
-      "phase": "Planning & Design",
-      "progress": 15,
+      "name": "Empowerreg",
+      "phase": "Digital Experience",
+      "progress": 100,
       "status": "Healthy"
     },
+    "department": "Digital Experience",
+    "totalHoursWorked": 8.25,
     "history": [],
     "currentEvaluation": {
-      "tech": 4,
-      "learn": 4,
-      "adapt": 4,
-      "attitude": 5,
-      "comments": "Outstanding initial month. Already delivering clean components."
-    }
+      "tech": 3,
+      "learn": 3,
+      "adapt": 3,
+      "attitude": 3,
+      "comments": ""
+    },
+    "syncedFromHr": true
   },
   {
-    "id": "james-wilson",
-    "name": "James Wilson",
-    "employeeId": "HR-2024-004",
-    "joinDate": "Nov 12, 2023",
-    "manager": "Elena Vance",
-    "probation": "Month 4/4",
+    "id": "kazi-ashique-ur-rahaman",
+    "name": "Kazi Ashique Ur Rahaman",
+    "employeeId": "SDS258",
+    "joinDate": "May 14, 2026",
+    "manager": "Demo Manager",
+    "probationDurationMonths": 4,
+    "probationEndDate": "Sep 14, 2026",
+    "probation": "Month 1/4",
     "status": "On Track",
-    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
+    "avatar": "https://ui-avatars.com/api/?name=Kazi%20Ashique%20Ur%20Rahaman&background=0044ff&color=fff",
     "project": {
-      "name": "Security Audit",
-      "phase": "Final Review",
-      "progress": 90,
+      "name": "SUNDEW ECOMMERCE",
+      "phase": "Engineering & Products",
+      "progress": 50,
       "status": "Healthy"
     },
+    "department": "Engineering & Products",
+    "totalHoursWorked": 4,
+    "history": [],
+    "currentEvaluation": {
+      "tech": 3,
+      "learn": 3,
+      "adapt": 3,
+      "attitude": 3,
+      "comments": ""
+    },
+    "syncedFromHr": true
+  },
+  {
+    "id": "anisha-mahanty",
+    "name": "Anisha Mahanty",
+    "employeeId": "SDS260",
+    "joinDate": "May 28, 2026",
+    "manager": "Demo Manager",
+    "probationDurationMonths": 4,
+    "probationEndDate": "Sep 28, 2026",
+    "probation": "Month 1/4",
+    "status": "On Track",
+    "avatar": "https://ui-avatars.com/api/?name=Anisha%20Mahanty&background=0044ff&color=fff",
+    "project": {
+      "name": "Sundew Connect Mobile App",
+      "phase": "Engineering & Products",
+      "progress": 38,
+      "status": "Healthy"
+    },
+    "department": "Engineering & Products",
+    "totalHoursWorked": 3,
     "history": [
       {
-        "month": "Nov",
-        "tech": 3.5,
-        "learn": 3.5,
+        "month": "Jun",
+        "monthKey": "2026-06",
+        "tech": 3,
+        "learn": 3,
         "adapt": 3,
-        "attitude": 4,
-        "comments": "Initial evaluation went smoothly.",
-        "average": 3.5
-      },
-      {
-        "month": "Dec",
-        "tech": 4,
-        "learn": 4,
-        "adapt": 4,
-        "attitude": 4,
-        "comments": "Strong audit logs produced.",
-        "average": 4
-      },
-      {
-        "month": "Jan",
-        "tech": 4.5,
-        "learn": 4,
-        "adapt": 4.5,
-        "attitude": 4.5,
-        "comments": "Highly independent. High contribution.",
-        "average": 4.375
+        "attitude": 3,
+        "comments": "",
+        "average": 3,
+        "savedAt": "2026-06-22T12:00:20.661Z",
+        "locked": true,
+        "status": "Locked",
+        "lockedBy": "Demo Manager",
+        "lockedDate": "2026-06-22T12:00:20.661Z"
       }
     ],
     "currentEvaluation": {
-      "tech": 5,
-      "learn": 4,
-      "adapt": 5,
-      "attitude": 5,
-      "comments": "Excellent compliance work. Strongly recommended to hire permanently."
-    }
+      "tech": 3,
+      "learn": 3,
+      "adapt": 3,
+      "attitude": 3,
+      "comments": ""
+    },
+    "syncedFromHr": true,
+    "averagePerformanceScore": 3,
+    "evaluationLockedForMonth": "2026-06"
+  },
+  {
+    "id": "kaustabh-dutta",
+    "name": "Kaustabh Dutta",
+    "employeeId": "SDS261",
+    "joinDate": "May 28, 2026",
+    "manager": "Demo Manager",
+    "probationDurationMonths": 4,
+    "probationEndDate": "Sep 28, 2026",
+    "probation": "Month 1/4",
+    "status": "Needs Improvement",
+    "avatar": "https://ui-avatars.com/api/?name=Kaustabh%20Dutta&background=0044ff&color=fff",
+    "project": {
+      "name": "ASMBEL 2.0",
+      "phase": "Engineering & Products",
+      "progress": 13,
+      "status": "Healthy"
+    },
+    "department": "Engineering & Products",
+    "totalHoursWorked": 1,
+    "history": [
+      {
+        "month": "Jun",
+        "monthKey": "2026-06",
+        "tech": 3,
+        "learn": 3,
+        "adapt": 1,
+        "attitude": 1,
+        "comments": "",
+        "average": 2,
+        "savedAt": "2026-06-23T12:18:16.267Z",
+        "locked": true,
+        "status": "Locked",
+        "lockedBy": "Demo Manager",
+        "lockedDate": "2026-06-23T12:18:16.267Z"
+      }
+    ],
+    "currentEvaluation": {
+      "tech": 3,
+      "learn": 3,
+      "adapt": 3,
+      "attitude": 3,
+      "comments": ""
+    },
+    "syncedFromHr": true,
+    "averagePerformanceScore": 2,
+    "evaluationLockedForMonth": "2026-06"
+  },
+  {
+    "id": "aparna-mitra",
+    "name": "Aparna Mitra",
+    "employeeId": "SDS263",
+    "joinDate": "May 28, 2026",
+    "manager": "Demo Manager",
+    "probationDurationMonths": 4,
+    "probationEndDate": "Sep 28, 2026",
+    "probation": "Month 1/4",
+    "status": "On Track",
+    "avatar": "https://ui-avatars.com/api/?name=Aparna%20Mitra&background=0044ff&color=fff",
+    "project": {
+      "name": "SUNDEW-WEBSITE-AND-DM",
+      "phase": "Marketing & Sales",
+      "progress": 94,
+      "status": "Healthy"
+    },
+    "department": "Marketing & Sales",
+    "totalHoursWorked": 7.5,
+    "history": [],
+    "currentEvaluation": {
+      "tech": 3,
+      "learn": 3,
+      "adapt": 3,
+      "attitude": 3,
+      "comments": ""
+    },
+    "syncedFromHr": true
+  },
+  {
+    "id": "tonmoy-chandra",
+    "name": "Tonmoy Chandra",
+    "employeeId": "SDS265",
+    "joinDate": "May 28, 2026",
+    "manager": "Demo Manager",
+    "probationDurationMonths": 4,
+    "probationEndDate": "Sep 28, 2026",
+    "probation": "Month 1/4",
+    "status": "On Track",
+    "avatar": "https://ui-avatars.com/api/?name=Tonmoy%20Chandra&background=0044ff&color=fff",
+    "project": {
+      "name": "INTERNAL FINANCE",
+      "phase": "Finance",
+      "progress": 13,
+      "status": "Healthy"
+    },
+    "department": "Finance",
+    "totalHoursWorked": 1,
+    "history": [],
+    "currentEvaluation": {
+      "tech": 3,
+      "learn": 3,
+      "adapt": 3,
+      "attitude": 3,
+      "comments": ""
+    },
+    "syncedFromHr": true
+  },
+  {
+    "id": "riya-ghosh",
+    "name": "Riya Ghosh",
+    "employeeId": "SDS266",
+    "joinDate": "May 19, 2026",
+    "manager": "Demo Manager",
+    "probationDurationMonths": 4,
+    "probationEndDate": "Sep 19, 2026",
+    "probation": "Month 1/4",
+    "status": "On Track",
+    "avatar": "https://ui-avatars.com/api/?name=Riya%20Ghosh&background=0044ff&color=fff",
+    "project": {
+      "name": "Empowerreg",
+      "phase": "Digital Experience",
+      "progress": 63,
+      "status": "Healthy"
+    },
+    "department": "Digital Experience",
+    "totalHoursWorked": 5,
+    "history": [],
+    "currentEvaluation": {
+      "tech": 3,
+      "learn": 3,
+      "adapt": 3,
+      "attitude": 3,
+      "comments": ""
+    },
+    "syncedFromHr": true
+  },
+  {
+    "id": "sarbojit-ghosh",
+    "name": "Sarbojit Ghosh",
+    "employeeId": "SDS267",
+    "joinDate": "May 28, 2026",
+    "manager": "Demo Manager",
+    "probationDurationMonths": 4,
+    "probationEndDate": "Sep 28, 2026",
+    "probation": "Month 1/4",
+    "status": "On Track",
+    "avatar": "https://ui-avatars.com/api/?name=Sarbojit%20Ghosh&background=0044ff&color=fff",
+    "project": {
+      "name": "ASMBEL 2.0",
+      "phase": "Engineering & Products",
+      "progress": 25,
+      "status": "Healthy"
+    },
+    "department": "Engineering & Products",
+    "totalHoursWorked": 2,
+    "history": [],
+    "currentEvaluation": {
+      "tech": 3,
+      "learn": 3,
+      "adapt": 3,
+      "attitude": 3,
+      "comments": ""
+    },
+    "syncedFromHr": true
+  },
+  {
+    "id": "vaibhav-ankush-mohite",
+    "name": "Vaibhav Ankush Mohite",
+    "employeeId": "SDS268",
+    "joinDate": "May 14, 2026",
+    "manager": "Demo Manager",
+    "probationDurationMonths": 4,
+    "probationEndDate": "Sep 14, 2026",
+    "probation": "Month 1/4",
+    "status": "On Track",
+    "avatar": "https://ui-avatars.com/api/?name=Vaibhav%20Ankush%20Mohite&background=0044ff&color=fff",
+    "project": {
+      "name": "ORG LEVEL ACTIVITIES - 2025-2026, 2026-2027",
+      "phase": "Engineering & Products",
+      "progress": 50,
+      "status": "Healthy"
+    },
+    "department": "Engineering & Products",
+    "totalHoursWorked": 4,
+    "history": [],
+    "currentEvaluation": {
+      "tech": 3,
+      "learn": 3,
+      "adapt": 3,
+      "attitude": 3,
+      "comments": ""
+    },
+    "syncedFromHr": true
   }
 ]

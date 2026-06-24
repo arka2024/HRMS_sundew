@@ -146,6 +146,12 @@ const writeDb = (data) => {
 
 const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+function normalizeScore(value) {
+  const score = Number(value);
+  if (!Number.isFinite(score)) return 3;
+  return Math.min(5, Math.max(1, Math.round(score)));
+}
+
 // Initialize DB on server start
 readDb();
 
@@ -220,10 +226,10 @@ app.post('/api/associates/:id/evaluations', (req, res) => {
 
   const associate = db[associateIndex];
   const parsedEvaluation = {
-    tech: parseFloat(tech),
-    learn: parseFloat(learn),
-    adapt: parseFloat(adapt),
-    attitude: parseFloat(attitude),
+    tech: normalizeScore(tech),
+    learn: normalizeScore(learn),
+    adapt: normalizeScore(adapt),
+    attitude: normalizeScore(attitude),
     comments: comments || ""
   };
   

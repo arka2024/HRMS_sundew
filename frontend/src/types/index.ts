@@ -52,3 +52,53 @@ export interface ServiceHealth {
   status: string;
   service: string;
 }
+
+export interface ProcessedAssociate {
+  employeeId: string;
+  name: string;
+  designation: string;
+  dateOfJoining: string;
+  probationDurationMonths: number;
+  probationEndDate: string;
+  probationProgress: number;
+  monthsWorking: number;
+  taskCount: number;
+}
+
+export interface AssociateUploadSuccess {
+  employeeId: string;
+  name: string;
+  designation?: string;
+  dateOfJoining: string;
+  probationDurationMonths: number;
+  probationEndDate: string;
+}
+
+export interface AssociateUploadFailure {
+  row: number;
+  employeeId?: string;
+  reason: string;
+}
+
+export interface AssociateUploadResponse {
+  summary: {
+    total: number;
+    successful: number;
+    failed: number;
+  };
+  successfulRecords: AssociateUploadSuccess[];
+  failedRecords: AssociateUploadFailure[];
+}
+
+export interface AssociateTaskSyncResponse {
+  summary: {
+    total: number;
+    updated: number;
+    failed: number;
+  };
+  updatedRecords: ProcessedAssociate[];
+  failedRecords: Array<{
+    employeeId: string;
+    reason: string;
+  }>;
+}

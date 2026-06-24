@@ -8,13 +8,15 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
 const BACKEND_SERVICES = [
-  { name: 'Auth Service', port: 5000, cwd: 'backend/auth-service' },
-  { name: 'HR Service', port: 5001, cwd: 'backend/hr-service' },
-  { name: 'Manager Service', port: 5002, cwd: 'backend/manager-service' },
-  { name: 'Report Service', port: 5003, cwd: 'backend/report-service' },
+  { name: 'Auth Service', port: 5000, cwd: 'backend/auth-service', entry: 'server.js' },
+  { name: 'HR Service', port: 5001, cwd: 'backend/hr-service', entry: 'server.js' },
+  { name: 'Manager Service', port: 5002, cwd: 'backend/manager-service', entry: 'server.js' },
+  { name: 'Report Service', port: 5003, cwd: 'backend/report-service', entry: 'server.js' },
+  { name: 'Probation Service', port: 5004, cwd: 'backend/probation-service', entry: 'src/server.js' },
 ];
 
-const FRONTEND_PORT = 3000;
+const ROOT_SERVER_PORT = 3000;
+const FRONTEND_PORT = 5173;
 const MAX_HEALTH_RETRIES = 30;
 const HEALTH_RETRY_DELAY_MS = 1000;
 
@@ -61,7 +63,8 @@ async function startBackends() {
   console.log('\nStarting backend services...\n');
 
   for (const service of BACKEND_SERVICES) {
-    startProcess(service.name, 'node', ['server.js'], service.cwd);
+    const entry = service.entry || 'server.js';
+    startProcess(service.name, 'node', [entry], service.cwd);
   }
 
   await sleep(1500);
@@ -76,6 +79,11 @@ async function startBackends() {
   }
 
   console.log('\nAll backend services are healthy.\n');
+}
+
+function startRootServer() {
+  console.log(`Starting root portal server on http://localhost:${ROOT_SERVER_PORT}...\n`);
+  startProcess('Root Portal Server', 'node', ['server.js'], '.');
 }
 
 function startFrontend() {
@@ -102,15 +110,18 @@ async function main() {
   `);
 
   await startBackends();
+  startRootServer();
   startFrontend();
 
   console.log(`
 Services running:
-  Frontend        → http://localhost:${FRONTEND_PORT}
-  Auth Service    → http://localhost:5000
-  HR Service      → http://localhost:5001
-  Manager Service → http://localhost:5002
-  Report Service  → http://localhost:5003
+  Root Portal       → http://localhost:${ROOT_SERVER_PORT} (HR & Manager HTML portals)
+  React Frontend    → http://localhost:${FRONTEND_PORT}
+  Auth Service      → http://localhost:5000
+  HR Service        → http://localhost:5001
+  Manager Service   → http://localhost:5002
+  Report Service    → http://localhost:5003
+  Probation Service → http://localhost:5004
 
 Demo credentials:
   HR:      hr@sundew.com / password123

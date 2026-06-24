@@ -156,6 +156,80 @@
             justify-content: space-between;
             min-height: 100%;
         }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .nav-tab.active {
+            border-bottom: 2px solid #2774e8;
+            color: #2774e8;
+            font-weight: 600;
+        }
+        .associate-table th {
+            background: #eef2f7;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--hr-muted);
+            border-bottom: 1px solid var(--hr-border);
+        }
+        .associate-table td {
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .associate-table tbody tr:hover {
+            background-color: #f8f9ff;
+        }
+
+        .progress-bar-bg {
+            background: #e5e7eb;
+            border-radius: 999px;
+            height: 8px;
+            overflow: hidden;
+            width: 100%;
+            max-width: 160px;
+        }
+        .progress-bar-fill {
+            background: #2774e8;
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.3s ease;
+        }
+        .progress-bar-fill.high {
+            background: #15803d;
+        }
+        .progress-bar-fill.medium {
+            background: #d97706;
+        }
+        .progress-bar-fill.low {
+            background: #dc2626;
+        }
+
+        .summary-stat {
+            background: #fff;
+            border: 1px solid var(--hr-border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        .summary-stat strong {
+            font-size: 1.5rem;
+            display: block;
+            color: var(--hr-ink);
+        }
+        .summary-stat span {
+            font-size: 0.75rem;
+            color: var(--hr-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body class="bg-white text-gray-900" onload="enforceHRAccess()">
@@ -166,7 +240,7 @@
                 <h1 class="text-xl font-semibold text-gray-800">HR Manager Portal</h1>
                 <div class="flex items-center gap-4">
                     <div class="relative">
-                        <input type="text" placeholder="Search documents..." class="px-4 py-2 bg-gray-100 rounded-lg w-64 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="text" placeholder="Search..." class="px-4 py-2 bg-gray-100 rounded-lg w-64 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" id="globalSearch" oninput="filterActiveTable()">
                         <span class="material-symbols-outlined absolute right-3 top-2.5 text-gray-400">search</span>
                     </div>
                     <button class="p-2 hover:bg-gray-100 rounded-lg">
@@ -175,17 +249,18 @@
                     <button class="p-2 hover:bg-gray-100 rounded-lg">
                         <span class="material-symbols-outlined">settings</span>
                     </button>
-                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer">ET</div>
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer" id="headerAvatar">HR</div>
                 </div>
             </div>
             
             <!-- Sub Navigation -->
             <div class="bg-gray-50 border-t border-gray-200 px-6">
                 <div class="flex gap-8">
-                    <button class="px-4 py-3 text-sm font-medium text-gray-700 border-b-2 border-blue-500 text-blue-600">Dashboard</button>
-                    <button class="px-4 py-3 text-sm font-medium text-gray-600 hover:text-gray-900">Team</button>
-                    <button class="px-4 py-3 text-sm font-medium text-gray-600 hover:text-gray-900">Evaluations</button>
-                    <button class="px-4 py-3 text-sm font-medium text-gray-600 hover:text-gray-900">Reports</button>
+                    <button onclick="switchTab('dashboard')" class="nav-tab px-4 py-3 text-sm font-medium text-gray-600 hover:text-gray-900" data-tab="dashboard">Dashboard</button>
+                    <button onclick="switchTab('associates')" class="nav-tab px-4 py-3 text-sm font-medium text-gray-600 hover:text-gray-900" data-tab="associates">Associates</button>
+                    <button onclick="switchTab('upload')" class="nav-tab px-4 py-3 text-sm font-medium text-gray-600 hover:text-gray-900" data-tab="upload">Upload</button>
+                    <button onclick="switchTab('team')" class="nav-tab px-4 py-3 text-sm font-medium text-gray-600 hover:text-gray-900" data-tab="team">Team</button>
+                    <button onclick="switchTab('reports')" class="nav-tab px-4 py-3 text-sm font-medium text-gray-600 hover:text-gray-900" data-tab="reports">Reports</button>
                 </div>
             </div>
         </div>
@@ -206,17 +281,25 @@
                 </div>
 
                 <nav class="space-y-2">
-                    <div class="sidebar-item active px-4 py-3 rounded-lg flex items-center gap-3">
-                        <span class="material-symbols-outlined text-lg">folder</span>
-                        <span class="text-sm font-medium">Files</span>
+                    <div onclick="switchTab('dashboard')" class="sidebar-item active px-4 py-3 rounded-lg flex items-center gap-3">
+                        <span class="material-symbols-outlined text-lg">dashboard</span>
+                        <span class="text-sm font-medium">Dashboard</span>
                     </div>
-                    <div class="sidebar-item px-4 py-3 rounded-lg flex items-center gap-3 text-gray-700">
-                        <span class="material-symbols-outlined text-lg">history</span>
-                        <span class="text-sm font-medium">History</span>
+                    <div onclick="switchTab('associates')" class="sidebar-item px-4 py-3 rounded-lg flex items-center gap-3 text-gray-700">
+                        <span class="material-symbols-outlined text-lg">group</span>
+                        <span class="text-sm font-medium">Associates</span>
                     </div>
-                    <div class="sidebar-item px-4 py-3 rounded-lg flex items-center gap-3 text-gray-700" onclick="exportFiles()">
-                        <span class="material-symbols-outlined text-lg">download</span>
-                        <span class="text-sm font-medium">Export Files</span>
+                    <div onclick="switchTab('upload')" class="sidebar-item px-4 py-3 rounded-lg flex items-center gap-3 text-gray-700">
+                        <span class="material-symbols-outlined text-lg">upload_file</span>
+                        <span class="text-sm font-medium">Upload</span>
+                    </div>
+                    <div onclick="switchTab('team')" class="sidebar-item px-4 py-3 rounded-lg flex items-center gap-3 text-gray-700">
+                        <span class="material-symbols-outlined text-lg">groups</span>
+                        <span class="text-sm font-medium">Team</span>
+                    </div>
+                    <div onclick="switchTab('reports')" class="sidebar-item px-4 py-3 rounded-lg flex items-center gap-3 text-gray-700">
+                        <span class="material-symbols-outlined text-lg">bar_chart</span>
+                        <span class="text-sm font-medium">Reports</span>
                     </div>
                 </nav>
 
@@ -236,160 +319,260 @@
 
             <!-- Main Content -->
             <div class="flex-1 overflow-y-auto p-8 bg-gray-50">
-                <div class="mb-8">
-                    <div class="flex items-start justify-between gap-4">
-                        <div>
-                            <h2 class="text-3xl font-bold text-gray-900 mb-2">Document Management</h2>
-                            <p class="text-gray-600">Manage organization policies, contracts, and employee handbooks.</p>
+                <!-- TAB: Dashboard (default document management) -->
+                <div id="tab-dashboard" class="tab-content active">
+                    <div class="mb-8">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <h2 class="text-3xl font-bold text-gray-900 mb-2">Document Management</h2>
+                                <p class="text-gray-600">Manage organization policies, contracts, and employee handbooks.</p>
+                            </div>
+                            <button onclick="exportFiles()" class="bg-white border border-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg">download</span>
+                                Export Files
+                            </button>
                         </div>
-                        <button onclick="exportFiles()" class="bg-white border border-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-lg">download</span>
-                            Export Files
-                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-8">
+                        <div class="col-span-2 space-y-6">
+                            <div class="bg-white rounded-lg border border-gray-200 p-8 hr-card">
+                                <div class="file-upload-zone" onclick="document.getElementById('document-file-input').click()">
+                                    <input id="document-file-input" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt,.png,.jpg,.jpeg,.zip" class="hidden" onchange="handleSelectedFiles(event)">
+                                    <div class="mb-4">
+                                        <svg class="mx-auto w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                    </div>
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Drop files here to upload</h3>
+                                    <p class="text-sm text-gray-600">or <span class="text-blue-600 font-semibold">browse your computer</span> (Max 50MB per file)</p>
+                                    <div class="flex flex-wrap justify-center gap-2 mt-4">
+                                        <span class="file-type-chip">PDF</span>
+                                        <span class="file-type-chip">DOCX</span>
+                                        <span class="file-type-chip">XLSX</span>
+                                        <span class="file-type-chip">PPT</span>
+                                        <span class="file-type-chip">CSV</span>
+                                        <span class="file-type-chip">Images</span>
+                                        <span class="file-type-chip">ZIP</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-lg border border-gray-200 p-6 hr-card">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-lg font-semibold text-gray-900">Recent Documents</h3>
+                                    <div class="flex gap-2">
+                                        <button class="p-2 hover:bg-gray-100 rounded">
+                                            <span class="material-symbols-outlined">view_list</span>
+                                        </button>
+                                        <button class="p-2 hover:bg-gray-100 rounded">
+                                            <span class="material-symbols-outlined">view_comfy</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm">
+                                        <thead class="border-b border-gray-200">
+                                            <tr class="text-gray-600 font-semibold">
+                                                <th class="text-left py-3 px-4">NAME</th>
+                                                <th class="text-left py-3 px-4">TYPE</th>
+                                                <th class="text-left py-3 px-4">DATE ADDED</th>
+                                                <th class="text-left py-3 px-4">OWNER</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="documents-tbody">
+                                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                                <td class="py-4 px-4"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-red-500">picture_as_pdf</span><span class="font-medium text-gray-900">Employee Handbook 2024.pdf</span></div></td>
+                                                <td class="py-4 px-4 text-gray-600">PDF Document</td>
+                                                <td class="py-4 px-4 text-gray-600">Oct 12, 2023</td>
+                                                <td class="py-4 px-4"><div class="flex items-center gap-2"><div class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">EA</div><span class="text-gray-900">Elena A</span></div></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+                                    <span class="text-sm text-gray-600">Showing 1 of 1 documents</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="bg-white rounded-lg border border-gray-200 p-6 hr-card">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-6">Storage Statistics</h3>
+                                <div class="mb-6">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm font-medium text-gray-700">Total Used</span>
+                                        <span class="text-sm font-semibold text-gray-900">12.4 GB / 50 GB</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: 25%"></div>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-3 h-3 bg-blue-600 rounded-full"></div>
+                                        <div><p class="text-sm font-medium text-gray-700">Documents</p><p class="text-xs text-gray-500">842</p></div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-3 h-3 bg-green-600 rounded-full"></div>
+                                        <div><p class="text-sm font-medium text-gray-700">Media</p><p class="text-xs text-gray-500">156</p></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-8">
-                    <div class="col-span-2 space-y-6">
-                        <div class="bg-white rounded-lg border border-gray-200 p-8 hr-card">
-                            <div class="file-upload-zone" onclick="document.getElementById('document-file-input').click()">
-                                <input id="document-file-input" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt,.png,.jpg,.jpeg,.zip" class="hidden" onchange="handleSelectedFiles(event)">
-                                <div class="mb-4">
-                                    <svg class="mx-auto w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                </div>
-                                <h3 class="text-lg font-semibold text-gray-900 mb-2">Drop files here to upload</h3>
-                                <p class="text-sm text-gray-600">or <span class="text-blue-600 font-semibold">browse your computer</span> (Max 50MB per file)</p>
-                                <div class="flex flex-wrap justify-center gap-2 mt-4">
-                                    <span class="file-type-chip">PDF</span>
-                                    <span class="file-type-chip">DOCX</span>
-                                    <span class="file-type-chip">XLSX</span>
-                                    <span class="file-type-chip">PPT</span>
-                                    <span class="file-type-chip">CSV</span>
-                                    <span class="file-type-chip">Images</span>
-                                    <span class="file-type-chip">ZIP</span>
-                                </div>
+                <!-- TAB: Associates (Processed associate data from uploads) -->
+                <div id="tab-associates" class="tab-content">
+                    <div class="mb-8 flex items-start justify-between gap-4">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-900 mb-2">Processed Associates</h2>
+                            <p class="text-gray-600">Probation data calculated from uploaded associate records.</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="syncTasks()" class="bg-white border border-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg">sync</span>
+                                Sync Tasks
+                            </button>
+                            <button onclick="loadProcessedAssociates()" class="bg-white border border-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg">refresh</span>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg border border-gray-200 p-6 hr-card">
+                        <div id="associates-summary" class="grid grid-cols-4 gap-4 mb-6"></div>
+                        <div class="overflow-x-auto">
+                            <table class="associate-table w-full text-sm">
+                                <thead>
+                                    <tr>
+                                        <th onclick="sortAssociates('employeeId')" style="cursor:pointer">Employee ID <span id="sort-employeeId" class="text-xs">▲</span></th>
+                                        <th onclick="sortAssociates('name')" style="cursor:pointer">Name <span id="sort-name" class="text-xs">▲</span></th>
+                                        <th onclick="sortAssociates('dateOfJoining')" style="cursor:pointer">DOJ <span id="sort-dateOfJoining" class="text-xs"></span></th>
+                                        <th onclick="sortAssociates('probationDurationMonths')" style="cursor:pointer">Duration <span id="sort-probationDurationMonths" class="text-xs"></span></th>
+                                        <th onclick="sortAssociates('probationEndDate')" style="cursor:pointer">Probation End <span id="sort-probationEndDate" class="text-xs"></span></th>
+                                        <th onclick="sortAssociates('probationProgress')" style="cursor:pointer">Progress <span id="sort-probationProgress" class="text-xs"></span></th>
+                                        <th onclick="sortAssociates('taskCount')" style="cursor:pointer">Tasks <span id="sort-taskCount" class="text-xs"></span></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="associates-tbody">
+                                    <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--hr-muted)">No associates found. Upload a CSV/XLSX file first.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="associates-pagination" class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100"></div>
+                    </div>
+                </div>
+
+                <!-- TAB: Upload (HR uploads CSV/XLSX) -->
+                <div id="tab-upload" class="tab-content">
+                    <div class="mb-8">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-900 mb-2">Associate Upload</h2>
+                            <p class="text-gray-600">Import probation associate data from CSV or XLSX files.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg border border-gray-200 p-8 hr-card mb-6">
+                        <div class="file-upload-zone" id="associateUploadZone" onclick="document.getElementById('associate-file-input').click()">
+                            <input id="associate-file-input" type="file" accept=".csv,.xlsx" class="hidden" onchange="onAssociateFileSelect(event)">
+                            <div class="mb-4">
+                                <svg class="mx-auto w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                             </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2" id="associateFileName">Drop CSV or XLSX file here</h3>
+                            <p class="text-sm text-gray-600">or <span class="text-blue-600 font-semibold">browse your computer</span></p>
+                            <div class="flex flex-wrap justify-center gap-2 mt-4">
+                                <span class="file-type-chip">CSV</span>
+                                <span class="file-type-chip">XLSX</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-3">Required columns: Employee ID, Employee Name, Date of Joining, Probation Duration Months</p>
                         </div>
 
-                        <div class="bg-white rounded-lg border border-gray-200 p-6 hr-card">
-                            <div class="flex items-center justify-between mb-6">
-                                <h3 class="text-lg font-semibold text-gray-900">Recent Documents</h3>
-                                <div class="flex gap-2">
-                                    <button class="p-2 hover:bg-gray-100 rounded">
-                                        <span class="material-symbols-outlined">view_list</span>
-                                    </button>
-                                    <button class="p-2 hover:bg-gray-100 rounded">
-                                        <span class="material-symbols-outlined">view_comfy</span>
-                                    </button>
+                        <div class="flex gap-3 mt-4">
+                            <button onclick="uploadAssociates()" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 flex items-center gap-2" id="btnUpload">
+                                <span class="material-symbols-outlined text-lg">upload_file</span>
+                                Upload Associates
+                            </button>
+                            <button onclick="syncTasks()" class="bg-white border border-gray-200 text-gray-800 px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 flex items-center gap-2" id="btnSync">
+                                <span class="material-symbols-outlined text-lg">sync</span>
+                                Sync Task Counts
+                            </button>
+                        </div>
+
+                        <div id="uploadError" class="mt-4 text-red-600 text-sm font-semibold hidden"></div>
+                        <div id="uploadLoading" class="mt-4 text-blue-600 text-sm font-semibold hidden">
+                            <span class="material-symbols-outlined animate-spin text-lg">refresh</span> Processing...
+                        </div>
+                    </div>
+
+                    <!-- Upload Results -->
+                    <div id="uploadResults" class="hidden">
+                        <div class="bg-white rounded-lg border border-gray-200 p-6 hr-card mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Import Summary</h3>
+                            <div id="uploadSummaryStats" class="grid grid-cols-3 gap-4 mb-6"></div>
+
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-700 mb-3">Successful Records</h4>
+                                    <div class="overflow-x-auto max-h-60 overflow-y-auto">
+                                        <table class="associate-table w-full text-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Employee ID</th>
+                                                    <th>Name</th>
+                                                    <th>DOJ</th>
+                                                    <th>Probation End</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="uploadSuccessTbody"></tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
-                                    <thead class="border-b border-gray-200">
-                                        <tr class="text-gray-600 font-semibold">
-                                            <th class="text-left py-3 px-4">NAME</th>
-                                            <th class="text-left py-3 px-4">TYPE</th>
-                                            <th class="text-left py-3 px-4">DATE ADDED</th>
-                                            <th class="text-left py-3 px-4">OWNER</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="border-b border-gray-100 hover:bg-gray-50">
-                                            <td class="py-4 px-4"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-red-500">picture_as_pdf</span><span class="font-medium text-gray-900">Employee Handbook 2024.pdf</span></div></td>
-                                            <td class="py-4 px-4 text-gray-600">PDF Document</td>
-                                            <td class="py-4 px-4 text-gray-600">Oct 12, 2023</td>
-                                            <td class="py-4 px-4"><div class="flex items-center gap-2"><div class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">EA</div><span class="text-gray-900">Elena A</span></div></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
-                                <span class="text-sm text-gray-600">Showing 4 of 128 documents</span>
-                                <div class="flex gap-2">
-                                    <button class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded">Previous</button>
-                                    <button class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded">Next</button>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-700 mb-3">Failed Records</h4>
+                                    <div class="overflow-x-auto max-h-60 overflow-y-auto">
+                                        <table class="associate-table w-full text-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Row</th>
+                                                    <th>Employee ID</th>
+                                                    <th>Reason</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="uploadFailedTbody"></tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="space-y-6">
+                <!-- TAB: Team -->
+                <div id="tab-team" class="tab-content">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Team Members</h2>
+                        <p class="text-gray-600">View all registered associates and their probation status.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="teamGrid"></div>
+                </div>
+
+                <!-- TAB: Reports -->
+                <div id="tab-reports" class="tab-content">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Reports & Analytics</h2>
+                        <p class="text-gray-600">Probation status distribution and performance metrics.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white rounded-lg border border-gray-200 p-6 hr-card">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-6">Storage Statistics</h3>
-                            <div class="mb-6">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-sm font-medium text-gray-700">Total Used</span>
-                                    <span class="text-sm font-semibold text-gray-900">12.4 GB / 50 GB</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 25%"></div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-3 h-3 bg-blue-600 rounded-full"></div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-700">Documents</p>
-                                        <p class="text-xs text-gray-500">842</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <div class="w-3 h-3 bg-green-600 rounded-full"></div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-700">Media</p>
-                                        <p class="text-xs text-gray-500">156</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-6 pt-6 border-t border-gray-200 space-y-3 text-sm">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-600">Legal & Contracts</span>
-                                    <span class="text-gray-900 font-medium">(4.2 GB)</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-600">Internal Policies</span>
-                                    <span class="text-gray-900 font-medium">(3.1 GB)</span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-600">Employee Records</span>
-                                    <span class="text-gray-900 font-medium">(5.1 GB)</span>
-                                </div>
-                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Probation Status Distribution</h3>
+                            <div id="reportStatusDist" class="space-y-4"></div>
                         </div>
-
                         <div class="bg-white rounded-lg border border-gray-200 p-6 hr-card">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-6">File History</h3>
-                            <div class="space-y-4">
-                                <div class="flex gap-3">
-                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                                        <span class="material-symbols-outlined text-green-600 text-sm">check</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900">Sarah Thompson updated<br><span class="text-xs text-gray-500">Policy_2024_v2</span></p>
-                                        <p class="text-xs text-gray-500 mt-1">2 hours ago</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="w-full mt-6 pt-4 border-t border-gray-200 text-blue-600 text-sm font-medium hover:text-blue-700 text-center">View Full History</button>
-                        </div>
-
-                        <div class="document-footer-row">
-                            <div class="bg-blue-900 rounded-lg p-4 text-white">
-                                <h3 class="text-base font-semibold mb-1">Secure E-Signatures</h3>
-                                <p class="text-xs text-blue-200 mb-3">Send handbooks and contracts for digital approval.</p>
-                                <button class="bg-white text-blue-900 px-3 py-1.5 rounded font-medium text-xs hover:bg-blue-50">Configure</button>
-                            </div>
-                            <div class="document-footer-card">
-                                <div>
-                                    <p class="text-xs uppercase tracking-wide text-gray-500 font-bold">Files</p>
-                                    <p class="text-lg font-bold text-gray-900">128</p>
-                                </div>
-                                <button onclick="exportFiles()" class="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-blue-700">Export</button>
-                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
+                            <div id="reportQuickStats" class="space-y-4"></div>
                         </div>
                     </div>
                 </div>
@@ -401,6 +584,19 @@
     <script src="../route-protection.js"></script>
 
     <script>
+        // ── Configuration ──
+        const API_BASE = 'http://localhost:5001';
+
+        // ── State ──
+        let associatesData = [];
+        let sortField = 'employeeId';
+        let sortDir = 'asc';
+        let currentPage = 1;
+        const PAGE_SIZE = 10;
+        let selectedFile = null;
+        let activeTabName = 'dashboard';
+
+        // ── Auth ──
         function enforceHRAccess() {
             const user = authService.getCurrentUser();
             if (!user) {
@@ -411,6 +607,10 @@
                 const homeUrl = routeProtection.getHomeDashboard(user.role);
                 window.location.href = homeUrl;
                 return;
+            }
+            const avatar = document.getElementById('headerAvatar');
+            if (avatar && user.name) {
+                avatar.textContent = user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
             }
         }
 
@@ -433,11 +633,336 @@
             event.target.value = '';
         }
 
-        document.querySelectorAll('.sidebar-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
+        // ── Tab System ──
+        function switchTab(tabName) {
+            activeTabName = tabName;
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + tabName)?.classList.add('active');
+
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll(`.nav-tab[data-tab="${tabName}"]`).forEach(t => t.classList.add('active'));
+
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.sidebar-item').forEach(i => {
+                if (i.textContent.toLowerCase().includes(tabName)) i.classList.add('active');
             });
+
+            if (tabName === 'associates') loadProcessedAssociates();
+            if (tabName === 'team') loadTeamView();
+            if (tabName === 'reports') loadReports();
+        }
+
+        // ── Associate Upload ──
+        function onAssociateFileSelect(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            selectedFile = file;
+            document.getElementById('associateFileName').textContent = file.name;
+            document.getElementById('uploadError').classList.add('hidden');
+        }
+
+        async function uploadAssociates() {
+            const errorEl = document.getElementById('uploadError');
+            const loadingEl = document.getElementById('uploadLoading');
+            errorEl.classList.add('hidden');
+
+            if (!selectedFile) {
+                errorEl.textContent = 'Please select a CSV or XLSX file first.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            const ext = selectedFile.name.split('.').pop().toLowerCase();
+            if (!['csv', 'xlsx'].includes(ext)) {
+                errorEl.textContent = 'Only .csv and .xlsx files are supported.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            loadingEl.classList.remove('hidden');
+            document.getElementById('btnUpload').disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                const response = await fetch(`${API_BASE}/api/associates/upload`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({ error: 'Upload failed' }));
+                    throw new Error(err.error || `HTTP ${response.status}`);
+                }
+                const result = await response.json();
+                showUploadResults(result);
+                selectedFile = null;
+                document.getElementById('associateFileName').textContent = 'Drop CSV or XLSX file here';
+            } catch (err) {
+                errorEl.textContent = err.message || 'Upload failed. Is the backend running?';
+                errorEl.classList.remove('hidden');
+            } finally {
+                loadingEl.classList.add('hidden');
+                document.getElementById('btnUpload').disabled = false;
+            }
+        }
+
+        function showUploadResults(result) {
+            document.getElementById('uploadResults').classList.remove('hidden');
+
+            const stats = document.getElementById('uploadSummaryStats');
+            stats.innerHTML = `
+                <div class="summary-stat"><strong>${result.summary.total}</strong><span>Total Rows</span></div>
+                <div class="summary-stat"><strong>${result.summary.successful}</strong><span>Successful</span></div>
+                <div class="summary-stat"><strong>${result.summary.failed}</strong><span>Failed</span></div>
+            `;
+
+            const successTbody = document.getElementById('uploadSuccessTbody');
+            successTbody.innerHTML = result.successfulRecords.map(r => `
+                <tr>
+                    <td>${r.employeeId}</td>
+                    <td>${r.name}</td>
+                    <td>${r.dateOfJoining}</td>
+                    <td>${r.probationEndDate}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--hr-muted)">No successful records</td></tr>';
+
+            const failedTbody = document.getElementById('uploadFailedTbody');
+            failedTbody.innerHTML = result.failedRecords.map(r => `
+                <tr>
+                    <td>${r.row}</td>
+                    <td>${r.employeeId || '-'}</td>
+                    <td>${r.reason}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--hr-muted)">No failed records</td></tr>';
+        }
+
+        // ── Sync Tasks ──
+        async function syncTasks() {
+            const btn = document.getElementById('btnSync');
+            const loadingEl = document.getElementById('uploadLoading');
+            if (btn) btn.disabled = true;
+            if (loadingEl) {
+                loadingEl.textContent = 'Syncing task counts...';
+                loadingEl.classList.remove('hidden');
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/associates/sync-tasks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const result = await response.json();
+                alert(`Task sync complete: ${result.summary.updated} updated, ${result.summary.failed} failed.`);
+                loadProcessedAssociates();
+            } catch (err) {
+                alert('Task sync failed: ' + (err.message || 'Backend unavailable'));
+            } finally {
+                if (btn) btn.disabled = false;
+                if (loadingEl) {
+                    loadingEl.textContent = 'Processing...';
+                    loadingEl.classList.add('hidden');
+                }
+            }
+        }
+
+        // ── Processed Associates Table ──
+        async function loadProcessedAssociates() {
+            try {
+                const response = await fetch(`${API_BASE}/api/associates`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                associatesData = data.associates || data || [];
+                renderAssociatesTable();
+            } catch (err) {
+                console.error('Failed to load associates:', err);
+                document.getElementById('associates-tbody').innerHTML =
+                    '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--hr-muted)">Failed to load associates. Is the backend running on port 5001?</td></tr>';
+            }
+        }
+
+        function sortAssociates(field) {
+            if (sortField === field) {
+                sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortField = field;
+                sortDir = 'asc';
+            }
+            document.querySelectorAll('.associate-table thead th span').forEach(s => s.textContent = '');
+            const sortIcon = document.getElementById('sort-' + field);
+            if (sortIcon) sortIcon.textContent = sortDir === 'asc' ? '▲' : '▼';
+            renderAssociatesTable();
+        }
+
+        function renderAssociatesTable() {
+            const sorted = [...associatesData].sort((a, b) => {
+                let va = a[sortField], vb = b[sortField];
+                if (typeof va === 'string') va = va.toLowerCase();
+                if (typeof vb === 'string') vb = vb.toLowerCase();
+                if (va < vb) return sortDir === 'asc' ? -1 : 1;
+                if (va > vb) return sortDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+            currentPage = Math.min(currentPage, totalPages);
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const paged = sorted.slice(start, start + PAGE_SIZE);
+
+            const tbody = document.getElementById('associates-tbody');
+            if (paged.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--hr-muted)">No associates found.</td></tr>';
+            } else {
+                tbody.innerHTML = paged.map(a => {
+                    const progress = a.probationProgress || 0;
+                    let barClass = 'progress-bar-fill';
+                    if (progress >= 80) barClass += ' high';
+                    else if (progress >= 50) barClass += ' medium';
+                    else barClass += ' low';
+                    return `<tr>
+                        <td><strong>${a.employeeId}</strong></td>
+                        <td>${a.name}</td>
+                        <td>${a.dateOfJoining}</td>
+                        <td>${a.probationDurationMonths} mo</td>
+                        <td>${a.probationEndDate}</td>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:8px;min-width:140px">
+                                <div class="progress-bar-bg">
+                                    <div class="${barClass}" style="width:${progress}%"></div>
+                                </div>
+                                <strong style="font-size:0.78rem">${progress}%</strong>
+                            </div>
+                        </td>
+                        <td>${a.taskCount ?? 0}</td>
+                    </tr>`;
+                }).join('');
+            }
+
+            // Summary stats
+            const summaryEl = document.getElementById('associates-summary');
+            if (summaryEl) {
+                const onTrack = associatesData.filter(a => (a.probationProgress || 0) >= 75).length;
+                const needsHelp = associatesData.filter(a => (a.probationProgress || 0) < 75 && (a.probationProgress || 0) > 0).length;
+                const notStarted = associatesData.filter(a => !a.probationProgress || a.probationProgress === 0).length;
+                summaryEl.innerHTML = `
+                    <div class="summary-stat"><strong>${associatesData.length}</strong><span>Total</span></div>
+                    <div class="summary-stat"><strong>${onTrack}</strong><span>On Track</span></div>
+                    <div class="summary-stat"><strong>${needsHelp}</strong><span>In Progress</span></div>
+                    <div class="summary-stat"><strong>${notStarted}</strong><span>Not Started</span></div>
+                `;
+            }
+
+            // Pagination
+            const pagination = document.getElementById('associates-pagination');
+            if (pagination) {
+                pagination.innerHTML = `
+                    <span style="font-size:0.82rem;color:var(--hr-muted)">Showing ${paged.length} of ${sorted.length} associates</span>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <button onclick="prevPage()" class="px-3 py-1 text-sm border border-gray-200 rounded hover:bg-gray-50" ${currentPage <= 1 ? 'disabled' : ''}>Previous</button>
+                        <span style="font-size:0.82rem;font-weight:700">Page ${currentPage} of ${totalPages}</span>
+                        <button onclick="nextPage()" class="px-3 py-1 text-sm border border-gray-200 rounded hover:bg-gray-50" ${currentPage >= totalPages ? 'disabled' : ''}>Next</button>
+                    </div>
+                `;
+            }
+        }
+
+        function prevPage() { currentPage = Math.max(1, currentPage - 1); renderAssociatesTable(); }
+        function nextPage() { const totalPages = Math.max(1, Math.ceil(associatesData.length / PAGE_SIZE)); currentPage = Math.min(totalPages, currentPage + 1); renderAssociatesTable(); }
+        function filterActiveTable() {
+            const q = document.getElementById('globalSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('#associates-tbody tr');
+            rows.forEach(r => {
+                r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        // ── Team View ──
+        function loadTeamView() {
+            const grid = document.getElementById('teamGrid');
+            if (!grid) return;
+            if (associatesData.length === 0) {
+                grid.innerHTML = '<p class="text-gray-500 col-span-full">No associates found. Upload data first.</p>';
+                return;
+            }
+            grid.innerHTML = associatesData.map(a => {
+                const progress = a.probationProgress || 0;
+                return `<div class="bg-white rounded-lg border border-gray-200 p-5 hr-card">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">${a.name.split(' ').map(n => n[0]).join('').slice(0,2)}</div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900 text-sm">${a.name}</h4>
+                            <p class="text-xs text-gray-500">${a.employeeId}</p>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-600 space-y-1">
+                        <p>DOJ: ${a.dateOfJoining}</p>
+                        <p>Probation: ${a.probationDurationMonths} mo</p>
+                        <p>Ends: ${a.probationEndDate}</p>
+                    </div>
+                    <div class="mt-3">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-medium">Progress</span>
+                            <span class="font-bold">${progress}%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill ${progress >= 80 ? 'high' : progress >= 50 ? 'medium' : 'low'}" style="width:${progress}%"></div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ── Reports ──
+        function loadReports() {
+            if (associatesData.length === 0) return;
+            const total = associatesData.length;
+            const onTrack = associatesData.filter(a => (a.probationProgress || 0) >= 75).length;
+            const inProgress = associatesData.filter(a => (a.probationProgress || 0) >= 25 && (a.probationProgress || 0) < 75).length;
+            const early = associatesData.filter(a => (a.probationProgress || 0) < 25 && (a.probationProgress || 0) > 0).length;
+            const notStarted = associatesData.filter(a => !a.probationProgress || a.probationProgress === 0).length;
+
+            document.getElementById('reportStatusDist').innerHTML = `
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                    <span class="text-sm font-medium text-green-800">On Track (≥75%)</span>
+                    <span class="text-lg font-bold text-green-700">${onTrack}</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <span class="text-sm font-medium text-yellow-800">In Progress (25-74%)</span>
+                    <span class="text-lg font-bold text-yellow-700">${inProgress}</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-200">
+                    <span class="text-sm font-medium text-orange-800">Early Stage (<25%)</span>
+                    <span class="text-lg font-bold text-orange-700">${early}</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <span class="text-sm font-medium text-gray-800">Not Started (0%)</span>
+                    <span class="text-lg font-bold text-gray-700">${notStarted}</span>
+                </div>
+            `;
+
+            const totalTasks = associatesData.reduce((s, a) => s + (a.taskCount || 0), 0);
+            const avgProgress = total > 0 ? Math.round(associatesData.reduce((s, a) => s + (a.probationProgress || 0), 0) / total) : 0;
+            document.getElementById('reportQuickStats').innerHTML = `
+                <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <span class="text-sm font-medium text-blue-800">Total Associates</span>
+                    <span class="text-lg font-bold text-blue-700">${total}</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200">
+                    <span class="text-sm font-medium text-purple-800">Avg Progress</span>
+                    <span class="text-lg font-bold text-purple-700">${avgProgress}%</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                    <span class="text-sm font-medium text-indigo-800">Total Tasks</span>
+                    <span class="text-lg font-bold text-indigo-700">${totalTasks}</span>
+                </div>
+            `;
+        }
+
+        // ── Init ──
+        document.addEventListener('DOMContentLoaded', () => {
+            switchTab('dashboard');
+            // Auto-load associates data in background
+            setTimeout(loadProcessedAssociates, 500);
         });
     </script>
 </body>

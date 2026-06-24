@@ -1,0 +1,133 @@
+{
+  "managers": [
+    {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "employee_id": "MGR001",
+      "name": "Demo Manager",
+      "email": "demo.manager@sundew.com"
+    }
+  ],
+  "employees": [
+    {
+      "id": "uuid-0",
+      "employee_number": "SDS250",
+      "employee_name": "Aishik Maitra",
+      "date_of_joining": "2026-05-27T18:29:50.000Z",
+      "total_hours_worked": 6,
+      "department": "Analytics & Automation",
+      "project_name": "ASMBEL 2.0",
+      "manager_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "created_at": "2026-06-22T08:22:18.607Z",
+      "updated_at": "2026-06-22T08:22:18.608Z"
+    },
+    {
+      "id": "uuid-1",
+      "employee_number": "SDS254",
+      "employee_name": "Arunabha Talukdar",
+      "date_of_joining": "2026-05-26T18:29:50.000Z",
+      "total_hours_worked": 8.25,
+      "department": "Digital Experience",
+      "project_name": "Empowerreg",
+      "manager_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "created_at": "2026-06-22T08:22:18.608Z",
+      "updated_at": "2026-06-22T08:22:18.608Z"
+    },
+    {
+      "id": "uuid-2",
+      "employee_number": "SDS258",
+      "employee_name": "Kazi Ashique Ur Rahaman",
+      "date_of_joining": "2026-05-14T18:29:50.000Z",
+      "total_hours_worked": 4,
+      "department": "Engineering & Products",
+      "project_name": "SUNDEW ECOMMERCE",
+      "manager_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "created_at": "2026-06-22T08:22:18.608Z",
+      "updated_at": "2026-06-22T08:22:18.608Z"
+    },
+    {
+      "id": "uuid-3",
+      "employee_number": "SDS260",
+      "employee_name": "Anisha Mahanty",
+      "date_of_joining": "2026-05-28T18:29:50.000Z",
+      "total_hours_worked": 3,
+      "department": "Engineering & Products",
+      "project_name": "Sundew Connect Mobile App",
+      "manager_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "created_at": "2026-06-22T08:22:18.608Z",
+      "updated_at": "2026-06-22T08:22:18.608Z"
+    },
+    {
+      "id": "uuid-4",
+      "employee_number": "SDS261",
+      "employee_name": "Kaustabh Dutta",
+      "date_of_joining": "2026-05-28T18:29:50.000Z",
+      "total_hours_worked": 1,
+      "department": "Engineering & Products",
+      "project_name": "ASMBEL 2.0",
+      "manager_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "created_at": "2026-06-22T08:22:18.608Z",
+      "updated_at": "2026-06-22T08:22:18.608Z"
+    },
+    {
+      "id": "uuid-5",
+      "employee_number": "SDS263",
+      "employee_name": "Aparna Mitra",
+      "date_of_joining": "2026-05-28T18:29:50.000Z",
+      "total_hours_worked": 7.5,
+      "department": "Marketing & Sales",
+      "project_name": "SUNDEW-WEBSITE-AND-DM",
+      "manager_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "created_at": "2026-06-22T08:22:18.608Z",
+      "updated_at": "2026-06-22T08:22:18.608Z"
+    },
+    {
+      "id": "uuid-6",
+      "employee_number": "SDS265",
+      "employee_name": "Tonmoy Chandra",
+      "date_of_joining": "2026-05-28T18:29:50.000Z",
+      "total_hours_worked": 1,
+      "department": "Finance",
+      "project_name": "INTERNAL FINANCE",
+      "manager_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "created_at": "2026-06-22T08:22:18.608Z",
+      "updated_at": "2026-06-22T08:22:18.608Z"
+    },
+    {
+      "id": "uuid-7",
+      "employee_number": "SDS266",
+      "employee_name": "Riya Ghosh",
+      "date_of_joining": "2026-05-19T18:29:50.000Z",
+      "total_hours_worked": 5,
+      "department": "Digital Experience",
+      "project_name": "Empowerreg",
+      "manager_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "created_at": "2026-06-22T08:22:18.608Z",
+      "updated_at": "2026-06-22T08:22:18.608Z"
+    },
+    {
+      "id": "uuid-8",
+      "employee_number": "SDS267",
+      "employee_name": "Sarbojit Ghosh",
+      "date_of_joining": "2026-05-28T18:29:50.000Z",
+      "total_hours_worked": 2,
+      "department": "Engineering & Products",
+      "project_name": "ASMBEL 2.0",
+      "manager_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "created_at": "2026-06-22T08:22:18.608Z",
+      "updated_at": "2026-06-22T08:22:18.608Z"
+    },
+    {
+      "id": "uuid-9",
+      "employee_number": "SDS268",
+      "employee_name": "Vaibhav Ankush Mohite",
+      "date_of_joining": "2026-05-14T18:29:50.000Z",
+      "total_hours_worked": 4,
+      "department": "Engineering & Products",
+      "project_name": "ORG LEVEL ACTIVITIES - 2025-2026, 2026-2027",
+      "manager_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "created_at": "2026-06-22T08:22:18.608Z",
+      "updated_at": "2026-06-22T08:22:18.608Z"
+    }
+  ],
+  "uploadHistory": []
+}

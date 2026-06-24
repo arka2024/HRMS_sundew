@@ -134,26 +134,27 @@ html.dark .hover-card-lift:hover {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--secondary);
   cursor: pointer;
   border: 2px solid var(--surface-container-lowest);
-  box-shadow: 0 0 0 5px rgba(7, 86, 197, 0.12), 0 3px 8px rgba(15, 23, 42, 0.18);
-  transition: transform 0.1s ease;
+  box-shadow: 0 0 0 6px rgba(7, 86, 197, 0.15), 0 4px 10px rgba(15, 23, 42, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.12);
+  transform: scale(1.15);
+  box-shadow: 0 0 0 8px rgba(7, 86, 197, 0.2), 0 6px 12px rgba(15, 23, 42, 0.25);
 }
 
 input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--secondary);
   border: 2px solid var(--surface-container-lowest);
-  box-shadow: 0 0 0 5px rgba(7, 86, 197, 0.12), 0 3px 8px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 0 0 6px rgba(7, 86, 197, 0.15), 0 4px 10px rgba(15, 23, 42, 0.2);
 }
 
 /* Manager portal polish */
@@ -176,9 +177,23 @@ aside {
 }
 
 main > section {
-  max-width: 1180px;
+  max-width: 1400px;
   width: 100%;
   margin-inline: auto;
+  padding: 2rem;
+}
+
+/* Improved navigation active states */
+.nav-tab {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-tab:hover {
+  transform: translateY(-1px);
+}
+
+.nav-tab:active {
+  transform: translateY(0);
 }
 
 #tab-content-dashboard > .bg-surface-container-lowest,
@@ -188,6 +203,30 @@ main > section {
 #notifications-dropdown,
 .glass-panel {
   box-shadow: var(--shadow-sm);
+}
+
+/* Improved table styling */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+table th {
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+table tr:hover td {
+  background-color: var(--surface-container-low);
+}
+
+/* Improved button spacing */
+button {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+button:active {
+  transform: scale(0.98);
 }
 
 #tab-content-dashboard > .bg-surface-container-lowest {
@@ -204,6 +243,11 @@ main > section {
   height: 8px;
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(7, 86, 197, 0.14), var(--surface-container-high));
+}
+
+#evaluation-form input[type="range"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(7, 86, 197, 0.2);
 }
 
 #month-rating-stars {
@@ -276,6 +320,10 @@ textarea {
     border-left: 0;
     border-top: 1px solid var(--outline-variant);
   }
+  
+  main > section {
+    padding: 1.5rem;
+  }
 }
 
 @media (max-width: 640px) {
@@ -289,6 +337,25 @@ textarea {
 
   #btn-save-evaluation {
     width: 100%;
+  }
+  
+  main > section {
+    padding: 1rem;
+  }
+  
+  #tab-content-dashboard > .bg-surface-container-lowest {
+    padding: 1.5rem !important;
+  }
+}
+
+/* Responsive sidebar improvements */
+@media (max-width: 1024px) {
+  aside {
+    width: 280px;
+  }
+  
+  main {
+    margin-left: 0;
   }
 }
 

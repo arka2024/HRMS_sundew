@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node scripts/start-all.js",
     "install:all": "npm install && npm run install:backends && npm run install:frontend",
-    "install:backends": "npm install --prefix backend/auth-service && npm install --prefix backend/hr-service && npm install --prefix backend/manager-service && npm install --prefix backend/report-service",
+    "install:backends": "npm install --prefix backend/auth-service && npm install --prefix backend/hr-service && npm install --prefix backend/manager-service && npm install --prefix backend/report-service && npm install --prefix backend/probation-service",
     "install:frontend": "npm install --prefix frontend",
     "dev": "node scripts/start-all.js"
   },
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "cors": "^2.8.6",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "mongodb": "^7.3.0"
   }
 }

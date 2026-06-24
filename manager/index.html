@@ -140,15 +140,32 @@
                 <span class="material-symbols-outlined text-secondary" data-icon="shield_person">shield_person</span>
                 HR Manager Portal
             </span>
-            <nav class="hidden md:flex items-center gap-6 pl-md border-l border-outline-variant">
+            <nav class="hidden md:flex items-center gap-2 pl-md border-l border-outline-variant">
                 <button id="nav-dashboard" onclick="switchTab('dashboard')"
-                    class="text-secondary border-b-2 border-secondary font-bold pb-1 text-sm transition-all focus:outline-none">Dashboard</button>
+                    class="nav-tab text-secondary bg-secondary/10 font-bold px-4 py-2 rounded-lg text-sm transition-all focus:outline-none flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]" data-icon="dashboard">dashboard</span>
+                    Dashboard
+                </button>
                 <button id="nav-team" onclick="switchTab('team')"
-                    class="text-on-surface-variant hover:text-secondary transition-colors duration-150 text-sm pb-1 focus:outline-none">Team</button>
+                    class="nav-tab text-on-surface-variant hover:text-secondary hover:bg-surface-container-low transition-colors duration-150 text-sm px-4 py-2 rounded-lg focus:outline-none flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]" data-icon="groups">groups</span>
+                    Team
+                </button>
+                <button id="nav-associates" onclick="switchTab('associates')"
+                    class="nav-tab text-on-surface-variant hover:text-secondary hover:bg-surface-container-low transition-colors duration-150 text-sm px-4 py-2 rounded-lg focus:outline-none flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]" data-icon="people">people</span>
+                    Associates
+                </button>
                 <button id="nav-evaluations" onclick="switchTab('evaluations')"
-                    class="text-on-surface-variant hover:text-secondary transition-colors duration-150 text-sm pb-1 focus:outline-none">Evaluations</button>
+                    class="nav-tab text-on-surface-variant hover:text-secondary hover:bg-surface-container-low transition-colors duration-150 text-sm px-4 py-2 rounded-lg focus:outline-none flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]" data-icon="assessment">assessment</span>
+                    Evaluations
+                </button>
                 <button id="nav-reports" onclick="switchTab('reports')"
-                    class="text-on-surface-variant hover:text-secondary transition-colors duration-150 text-sm pb-1 focus:outline-none">Reports</button>
+                    class="nav-tab text-on-surface-variant hover:text-secondary hover:bg-surface-container-low transition-colors duration-150 text-sm px-4 py-2 rounded-lg focus:outline-none flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]" data-icon="analytics">analytics</span>
+                    Reports
+                </button>
             </nav>
         </div>
         <div class="flex items-center gap-4">
@@ -202,25 +219,25 @@
         </div>
 
         <!-- Associate List dynamically updated by JS -->
-        <nav id="associate-list" class="flex-1 space-y-1 overflow-y-auto custom-scrollbar px-1">
+        <nav id="associate-list" class="flex-1 space-y-2 overflow-y-auto custom-scrollbar px-2">
             <!-- Will be populated by JS -->
         </nav>
 
-        <div class="px-2 mt-auto space-y-4">
+        <div class="px-3 mt-auto space-y-4">
             <button onclick="openNewAssociateModal()"
-                class="w-full bg-primary text-white py-2.5 px-4 rounded-xl text-sm font-medium hover:opacity-90 hover-card-lift transition-all flex items-center justify-center gap-sm active:scale-95">
-                <span class="material-symbols-outlined text-[18px]" data-icon="person_add">person_add</span>
+                class="w-full bg-primary text-white py-3 px-4 rounded-xl text-sm font-medium hover:opacity-90 hover-card-lift transition-all flex items-center justify-center gap-2 active:scale-95 shadow-md">
+                <span class="material-symbols-outlined text-[20px]" data-icon="person_add">person_add</span>
                 New Evaluation
             </button>
-            <div class="pt-4 border-t border-outline-variant space-y-1">
+            <div class="pt-4 border-t border-outline-variant space-y-2">
                 <button onclick="switchTab('help')"
-                    class="w-full flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all text-left">
-                    <span class="material-symbols-outlined" data-icon="help">help</span>
+                    class="w-full flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all text-left">
+                    <span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
                     <span class="text-sm font-medium">Help Center</span>
                 </button>
                 <button onclick="logout()"
-                    class="w-full flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all text-left">
-                    <span class="material-symbols-outlined" data-icon="logout">logout</span>
+                    class="w-full flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all text-left">
+                    <span class="material-symbols-outlined text-[20px]" data-icon="logout">logout</span>
                     <span class="text-sm font-medium">Logout</span>
                 </button>
             </div>
@@ -236,134 +253,149 @@
             class="flex flex-col xl:overflow-y-auto custom-scrollbar p-6 space-y-6 xl:col-span-9 order-2 xl:order-1">
 
             <!-- Tab: Dashboard -->
-            <div id="tab-content-dashboard" class="space-y-6">
+            <div id="tab-content-dashboard" class="space-y-8">
                 <!-- Top: Employee Evaluation -->
                 <div
-                    class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm fade-in">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold text-primary font-headline-sm">Employee Evaluation</h3>
-                        <div class="flex items-center gap-2">
+                    class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 shadow-sm fade-in">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-primary font-headline-sm">Employee Evaluation</h3>
+                            <p class="text-sm text-on-surface-variant mt-1">Rate associate performance across key dimensions</p>
+                        </div>
+                        <div class="flex items-center gap-3 px-4 py-2 bg-surface-container-low rounded-xl border border-outline-variant">
+                            <span class="material-symbols-outlined text-[20px] text-secondary" data-icon="calendar_today">calendar_today</span>
                             <span class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Current
                                 Period</span>
-                            <span class="material-symbols-outlined text-[18px] text-on-surface-variant"
-                                data-icon="info">info</span>
                         </div>
                     </div>
 
-                    <form class="space-y-6" id="evaluation-form">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
+                    <form class="space-y-8" id="evaluation-form">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
                                     <label
-                                        class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Technical
-                                        Efficiency</label>
-                                    <span class="text-sm text-secondary font-bold" id="val-tech">3/5</span>
+                                        class="text-sm font-semibold text-on-surface-variant uppercase tracking-wider flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[18px] text-secondary" data-icon="code">code</span>
+                                        Technical Efficiency
+                                    </label>
+                                    <span class="text-sm text-secondary font-bold bg-secondary/10 px-3 py-1 rounded-lg" id="val-tech">3/5</span>
                                 </div>
                                 <input id="input-tech"
-                                    class="w-full h-1.5 bg-surface-container-high rounded-full appearance-none cursor-pointer"
-                                    max="5" min="1" step="0.1"
-                                    oninput="document.getElementById('val-tech').innerText = this.value + '/5'; updateLiveScores();"
+                                    class="w-full h-2 bg-surface-container-high rounded-full appearance-none cursor-pointer"
+                                    max="5" min="1" step="1"
+                                    oninput="updateLiveScores();"
                                     type="range" value="3" />
                             </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
                                     <label
-                                        class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Ability
-                                        to Learn</label>
-                                    <span class="text-sm text-secondary font-bold" id="val-learn">3/5</span>
+                                        class="text-sm font-semibold text-on-surface-variant uppercase tracking-wider flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[18px] text-[#15803d]" data-icon="school">school</span>
+                                        Ability to Learn
+                                    </label>
+                                    <span class="text-sm text-secondary font-bold bg-secondary/10 px-3 py-1 rounded-lg" id="val-learn">3/5</span>
                                 </div>
                                 <input id="input-learn"
-                                    class="w-full h-1.5 bg-surface-container-high rounded-full appearance-none cursor-pointer"
-                                    max="5" min="1" step="0.1"
-                                    oninput="document.getElementById('val-learn').innerText = this.value + '/5'; updateLiveScores();"
+                                    class="w-full h-2 bg-surface-container-high rounded-full appearance-none cursor-pointer"
+                                    max="5" min="1" step="1"
+                                    oninput="updateLiveScores();"
                                     type="range" value="3" />
                             </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
                                     <label
-                                        class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Ability
-                                        to Adapt</label>
-                                    <span class="text-sm text-secondary font-bold" id="val-adapt">3/5</span>
+                                        class="text-sm font-semibold text-on-surface-variant uppercase tracking-wider flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[18px] text-[#f59e0b]" data-icon="sync_alt">sync_alt</span>
+                                        Ability to Adapt
+                                    </label>
+                                    <span class="text-sm text-secondary font-bold bg-secondary/10 px-3 py-1 rounded-lg" id="val-adapt">3/5</span>
                                 </div>
                                 <input id="input-adapt"
-                                    class="w-full h-1.5 bg-surface-container-high rounded-full appearance-none cursor-pointer"
-                                    max="5" min="1" step="0.1"
-                                    oninput="document.getElementById('val-adapt').innerText = this.value + '/5'; updateLiveScores();"
+                                    class="w-full h-2 bg-surface-container-high rounded-full appearance-none cursor-pointer"
+                                    max="5" min="1" step="1"
+                                    oninput="updateLiveScores();"
                                     type="range" value="3" />
                             </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
                                     <label
-                                        class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Attitude</label>
-                                    <span class="text-sm text-secondary font-bold" id="val-att">3/5</span>
+                                        class="text-sm font-semibold text-on-surface-variant uppercase tracking-wider flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[18px] text-error" data-icon="sentiment_satisfied">sentiment_satisfied</span>
+                                        Attitude
+                                    </label>
+                                    <span class="text-sm text-secondary font-bold bg-secondary/10 px-3 py-1 rounded-lg" id="val-att">3/5</span>
                                 </div>
                                 <input id="input-att"
-                                    class="w-full h-1.5 bg-surface-container-high rounded-full appearance-none cursor-pointer"
-                                    max="5" min="1" step="0.1"
-                                    oninput="document.getElementById('val-att').innerText = this.value + '/5'; updateLiveScores();"
+                                    class="w-full h-2 bg-surface-container-high rounded-full appearance-none cursor-pointer"
+                                    max="5" min="1" step="1"
+                                    oninput="updateLiveScores();"
                                     type="range" value="3" />
                             </div>
                         </div>
 
-                        <div class="space-y-2">
-                            <label class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Month
-                                Rating</label>
-                            <div id="month-rating-stars" class="flex items-center gap-1 text-secondary mt-2">
+                        <div class="space-y-3">
+                            <label class="text-sm font-semibold text-on-surface-variant uppercase tracking-wider flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px] text-[#f59e0b]" data-icon="star">star</span>
+                                Month Rating
+                            </label>
+                            <div id="month-rating-stars" class="flex items-center gap-1 text-secondary mt-2 p-3 bg-surface-container-low rounded-xl border border-outline-variant">
                                 <!-- Stars injected by JS -->
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between border-t border-outline-variant pt-6 mt-4">
+                        <div class="flex items-center justify-between border-t border-outline-variant pt-8 mt-4">
                             <div class="flex flex-col">
                                 <span
-                                    class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Current
+                                    class="text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Current
                                     Period Score</span>
                                 <span class="text-xs text-on-surface-variant italic opacity-70">Average: (Tech + Learn +
                                     Adapt + Attitude) / 4</span>
                             </div>
                             <div class="text-right">
-                                <span id="live-average-score" class="text-3xl font-bold text-primary">3.0</span>
-                                <span class="text-sm text-on-surface-variant">/ 5.0</span>
+                                <span id="live-average-score" class="text-4xl font-bold text-primary">3.0</span>
+                                <span class="text-lg text-on-surface-variant">/ 5.0</span>
                             </div>
                         </div>
 
-                        <div class="space-y-4 pt-6 border-t border-outline-variant">
+                        <div class="space-y-6 pt-8 border-t border-outline-variant">
                             <label
-                                class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider block">Fit
-                                for Role Status</label>
+                                class="text-sm font-semibold text-on-surface-variant uppercase tracking-wider block flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px] text-secondary" data-icon="verified_user">verified_user</span>
+                                Fit for Role Status
+                            </label>
                             <div class="flex flex-col sm:flex-row gap-6">
                                 <div id="fit-role-container"
-                                    class="bg-[#f0fdf4] border border-[#15803d]/20 rounded-xl p-4 flex items-center gap-4 shadow-sm min-w-[240px]">
+                                    class="bg-[#f0fdf4] border border-[#15803d]/20 rounded-xl p-6 flex items-center gap-4 shadow-sm min-w-[280px]">
                                     <div id="fit-role-icon-bg"
-                                        class="w-10 h-10 bg-[#15803d] rounded-full flex items-center justify-center flex-shrink-0">
-                                        <span id="fit-role-icon" class="material-symbols-outlined text-white"
+                                        class="w-12 h-12 bg-[#15803d] rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span id="fit-role-icon" class="material-symbols-outlined text-white text-[24px]"
                                             data-icon="check_circle">check_circle</span>
                                     </div>
                                     <div class="flex flex-col">
                                         <span id="fit-role-status-text"
-                                            class="text-md font-bold text-[#15803d] leading-none">Fit for Role</span>
-                                        <span id="fit-role-message-text" class="text-xs text-[#15803d]/80 mt-1">Highly
+                                            class="text-lg font-bold text-[#15803d] leading-none">Fit for Role</span>
+                                        <span id="fit-role-message-text" class="text-sm text-[#15803d]/80 mt-1">Highly
                                             recommended for current position</span>
                                     </div>
                                 </div>
-                                <div class="flex-1 grid gap-4 border-l border-outline-variant pl-6">
-                                    <div class="space-y-1 w-full">
+                                <div class="flex-1 grid gap-4 border-l border-outline-variant pl-8">
+                                    <div class="space-y-2 w-full">
                                         <span
-                                            class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider block">RM
+                                            class="text-sm font-semibold text-on-surface-variant uppercase tracking-wider block">RM
                                             Remarks</span>
                                         <textarea id="eval-comments"
-                                            class="w-full p-2 border border-outline-variant rounded-xl text-sm bg-surface-container-low focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all resize-none mt-1"
+                                            class="w-full p-3 border border-outline-variant rounded-xl text-sm bg-surface-container-low focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all resize-none mt-1"
                                             placeholder="Provide qualitative feedback on recent achievements and areas for growth..."
-                                            rows="2"></textarea>
+                                            rows="3"></textarea>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex justify-end pt-4 border-t border-outline-variant">
+                        <div class="flex justify-end pt-8 border-t border-outline-variant">
                             <button id="btn-save-evaluation" type="submit"
-                                class="bg-primary text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:opacity-90 hover-card-lift transition-all flex items-center gap-2 active:scale-95">
-                                <span class="material-symbols-outlined text-[18px]" data-icon="save">save</span>
+                                class="bg-primary text-white px-8 py-3 rounded-xl text-sm font-semibold hover:opacity-90 hover-card-lift transition-all flex items-center gap-2 active:scale-95 shadow-lg">
+                                <span class="material-symbols-outlined text-[20px]" data-icon="save">save</span>
                                 Save Evaluation
                             </button>
                         </div>
@@ -372,26 +404,31 @@
 
                 <!-- Assessment & Stats Card -->
                 <div
-                    class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm fade-in grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-3">
-                        <h4 class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Fit for Role</h4>
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-[#15803d] text-[28px]"
+                    class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 shadow-sm fade-in grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <h4 class="text-sm font-bold text-on-surface-variant uppercase tracking-wider flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[20px] text-secondary" data-icon="verified">verified</span>
+                            Fit for Role
+                        </h4>
+                        <div class="flex items-center gap-4">
+                            <span class="material-symbols-outlined text-[#15803d] text-[36px]"
                                 data-icon="verified">verified</span>
-                            <span class="text-lg font-bold text-[#15803d]" id="probation-fit-status">Strongly
+                            <span class="text-2xl font-bold text-[#15803d]" id="probation-fit-status">Strongly
                                 Recommended</span>
                         </div>
                     </div>
-                    <div class="space-y-3 md:border-l md:border-outline-variant md:pl-6">
-                        <h4 class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Average
-                            Performance Score</h4>
-                        <div class="flex items-baseline gap-2">
-                            <span class="text-3xl font-bold text-primary" id="probation-avg-score">4.2</span>
-                            <span class="text-sm text-on-surface-variant">/ 5.0</span>
+                    <div class="space-y-4 md:border-l md:border-outline-variant md:pl-8">
+                        <h4 class="text-sm font-bold text-on-surface-variant uppercase tracking-wider flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[20px] text-secondary" data-icon="analytics">analytics</span>
+                            Average Performance Score
+                        </h4>
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-4xl font-bold text-primary" id="probation-avg-score">4.2</span>
+                            <span class="text-lg text-on-surface-variant">/ 5.0</span>
                             <span
-                                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-[#15803d] dark:bg-green-950/50 ml-2"
+                                class="inline-flex items-center px-3 py-1 rounded text-sm font-medium bg-green-100 text-[#15803d] dark:bg-green-950/50 ml-2"
                                 id="probation-trend">
-                                <span class="material-symbols-outlined text-[14px]"
+                                <span class="material-symbols-outlined text-[16px]"
                                     data-icon="trending_up">trending_up</span>
                                 <span id="trend-val">+0.4</span>
                             </span>
@@ -400,17 +437,22 @@
                 </div>
 
                 <!-- Performance Trends Section -->
-                <div class="space-y-4 fade-in">
-                    <h3 class="text-xs font-bold text-on-tertiary-container uppercase tracking-widest">Performance
-                        Trends</h3>
+                <div class="space-y-6 fade-in">
+                    <h3 class="text-sm font-bold text-on-tertiary-container uppercase tracking-widest flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[20px] text-secondary" data-icon="show_chart">show_chart</span>
+                        Performance Trends
+                    </h3>
 
                     <!-- 4 Small Charts Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         <!-- Tech Efficiency -->
                         <div
-                            class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-col shadow-sm">
-                            <span class="text-secondary font-bold text-xs mb-2">Tech Efficiency</span>
-                            <div class="h-20 w-full">
+                            class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col shadow-sm hover-card-lift">
+                            <span class="text-secondary font-bold text-sm mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]" data-icon="code">code</span>
+                                Tech Efficiency
+                            </span>
+                            <div class="h-24 w-full">
                                 <svg id="chart-tech" class="w-full h-full" viewBox="0 0 100 50"
                                     preserveAspectRatio="none">
                                     <!-- Dynamic elements injected by JS -->
@@ -419,9 +461,12 @@
                         </div>
                         <!-- Ability to Learn -->
                         <div
-                            class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-col shadow-sm">
-                            <span class="text-[#15803d] font-bold text-xs mb-2">Ability to Learn</span>
-                            <div class="h-20 w-full">
+                            class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col shadow-sm hover-card-lift">
+                            <span class="text-[#15803d] font-bold text-sm mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]" data-icon="school">school</span>
+                                Ability to Learn
+                            </span>
+                            <div class="h-24 w-full">
                                 <svg id="chart-learn" class="w-full h-full" viewBox="0 0 100 50"
                                     preserveAspectRatio="none">
                                     <!-- Dynamic elements -->
@@ -430,9 +475,12 @@
                         </div>
                         <!-- Ability to Adapt -->
                         <div
-                            class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-col shadow-sm">
-                            <span class="text-[#f59e0b] font-bold text-xs mb-2">Ability to Adapt</span>
-                            <div class="h-20 w-full">
+                            class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col shadow-sm hover-card-lift">
+                            <span class="text-[#f59e0b] font-bold text-sm mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]" data-icon="sync_alt">sync_alt</span>
+                                Ability to Adapt
+                            </span>
+                            <div class="h-24 w-full">
                                 <svg id="chart-adapt" class="w-full h-full" viewBox="0 0 100 50"
                                     preserveAspectRatio="none">
                                     <!-- Dynamic elements -->
@@ -441,9 +489,12 @@
                         </div>
                         <!-- Attitude -->
                         <div
-                            class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 flex flex-col shadow-sm">
-                            <span class="text-error font-bold text-xs mb-2">Attitude</span>
-                            <div class="h-20 w-full">
+                            class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col shadow-sm hover-card-lift">
+                            <span class="text-error font-bold text-sm mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]" data-icon="sentiment_satisfied">sentiment_satisfied</span>
+                                Attitude
+                            </span>
+                            <div class="h-24 w-full">
                                 <svg id="chart-attitude" class="w-full h-full" viewBox="0 0 100 50"
                                     preserveAspectRatio="none">
                                     <!-- Dynamic elements -->
@@ -453,12 +504,14 @@
                     </div>
 
                     <!-- Radar and Line Graph Grid -->
-                    <div class="flex flex-col lg:grid lg:grid-cols-12 gap-6">
+                    <div class="flex flex-col lg:grid lg:grid-cols-12 gap-8">
                         <!-- AI Suggestions -->
                         <div
-                            class="lg:col-span-5 bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 flex flex-col shadow-sm">
-                            <h4 class="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-4">AI
-                                Suggestions for Improvement</h4>
+                            class="lg:col-span-5 bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 flex flex-col shadow-sm">
+                            <h4 class="text-sm font-bold text-on-surface-variant uppercase tracking-wider mb-6 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[20px] text-secondary" data-icon="lightbulb">lightbulb</span>
+                                AI Suggestions for Improvement
+                            </h4>
                             <div class="flex-1 space-y-4" id="ai-suggestions-container">
                                 <!-- Dynamic suggestions -->
                             </div>
@@ -466,13 +519,15 @@
 
                         <!-- Monthly Avg Scores -->
                         <div
-                            class="lg:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 flex flex-col shadow-sm">
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                                <h4 class="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Total
-                                    Calculated Score Trend</h4>
-                                <span class="text-[11px] font-semibold text-on-surface-variant">Monthly average of Tech + Learn + Adapt + Attitude</span>
+                            class="lg:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 flex flex-col shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                                <h4 class="text-sm font-bold text-on-surface-variant uppercase tracking-wider flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[20px] text-secondary" data-icon="insights">insights</span>
+                                    Total Calculated Score Trend
+                                </h4>
+                                <span class="text-xs font-semibold text-on-surface-variant bg-surface-container-low px-3 py-1 rounded-lg">Monthly average of Tech + Learn + Adapt + Attitude</span>
                             </div>
-                            <div class="flex-1 w-full h-44">
+                            <div class="flex-1 w-full h-52">
                                 <svg id="chart-total" class="w-full h-full" viewBox="0 0 200 100"
                                     preserveAspectRatio="none">
                                     <!-- Dynamic graph -->
@@ -485,25 +540,36 @@
 
             <!-- Tab: Team -->
             <div id="tab-content-team" class="space-y-6 hidden">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-2xl font-bold text-primary font-headline-sm">Probation Associates Team</h3>
-                    <span id="team-count"
-                        class="px-3 py-1 bg-surface-container-high text-primary rounded-full text-xs font-bold">4
-                        Associates</span>
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+                    <div>
+                        <h3 class="text-2xl font-bold text-primary font-headline-sm">Probation Associates Team</h3>
+                        <p class="text-sm text-on-surface-variant mt-1">View and manage your assigned associates</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span id="team-count"
+                            class="px-4 py-2 bg-surface-container-high text-primary rounded-xl text-sm font-bold">4
+                            Associates</span>
+                    </div>
                 </div>
-                <div id="team-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div id="team-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Populated by JS -->
                 </div>
             </div>
 
             <!-- Tab: Evaluations -->
             <div id="tab-content-evaluations" class="space-y-6 hidden">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-2xl font-bold text-primary font-headline-sm">Evaluation Records Log</h3>
-                    <div class="flex gap-md">
-                        <input id="eval-search" type="text" placeholder="Search associate..."
-                            class="px-4 py-2 text-sm border border-outline-variant rounded-lg bg-surface-container-low focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none"
-                            oninput="filterEvaluationLog()">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-primary font-headline-sm">Evaluation Records Log</h3>
+                        <p class="text-sm text-on-surface-variant mt-1">View all evaluation history for your associates</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]" data-icon="search">search</span>
+                            <input id="eval-search" type="text" placeholder="Search associate..."
+                                class="pl-10 pr-4 py-2.5 text-sm border border-outline-variant rounded-xl bg-surface-container-low focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none w-64"
+                                oninput="filterEvaluationLog()">
+                        </div>
                     </div>
                 </div>
                 <div
@@ -528,15 +594,24 @@
                             </tbody>
                         </table>
                     </div>
+                    <div id="eval-pagination" class="flex items-center justify-between p-4 border-t border-outline-variant">
+                        <!-- Pagination controls -->
+                    </div>
                 </div>
             </div>
 
             <!-- Tab: Reports -->
             <div id="tab-content-reports" class="space-y-6 hidden">
-                <h3 class="text-2xl font-bold text-primary font-headline-sm mb-4">Analytics & Reports</h3>
+                <div>
+                    <h3 class="text-2xl font-bold text-primary font-headline-sm mb-2">Analytics & Reports</h3>
+                    <p class="text-sm text-on-surface-variant">Performance metrics and analytics for your team</p>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm">
-                        <h4 class="font-bold text-sm text-primary mb-4">Probation Status Distribution</h4>
+                    <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 shadow-sm">
+                        <h4 class="font-bold text-sm text-primary mb-6 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[20px] text-secondary" data-icon="pie_chart">pie_chart</span>
+                            Probation Status Distribution
+                        </h4>
                         <div class="h-60 flex items-center justify-center relative">
                             <!-- SVG Donut Chart for Statuses -->
                             <svg class="w-48 h-48" viewBox="0 0 36 36">
@@ -569,12 +644,54 @@
                     </div>
 
                     <div
-                        class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm flex flex-col">
-                        <h4 class="font-bold text-sm text-primary mb-4">Average Scores by Manager</h4>
+                        class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 shadow-sm flex flex-col">
+                        <h4 class="font-bold text-sm text-primary mb-6 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[20px] text-secondary" data-icon="bar_chart">bar_chart</span>
+                            Average Scores by Manager
+                        </h4>
                         <div class="flex-1 flex flex-col justify-end space-y-4 min-h-[240px]" id="manager-report-bars">
                             <!-- Populated by JS -->
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Tab: Associates (Processed data from HR uploads) -->
+            <div id="tab-content-associates" class="space-y-6 hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-primary font-headline-sm">Processed Associates</h3>
+                        <p class="text-sm text-on-surface-variant mt-1">Probation data calculated from HR uploads, including progress and task counts.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="loadProcessedAssociates()" class="px-4 py-2 border border-outline-variant text-on-surface rounded-xl hover:bg-surface-container text-sm font-semibold transition-all flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[18px]">refresh</span>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm">
+                    <div id="processed-summary" class="grid grid-cols-4 gap-4 mb-6"></div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse text-left">
+                            <thead>
+                                <tr class="bg-surface-container-low border-b border-outline-variant">
+                                    <th class="p-4 text-xs font-bold text-on-surface-variant uppercase cursor-pointer" onclick="sortProcessed('employeeId')">Employee ID <span id="psort-employeeId" class="text-xs">▲</span></th>
+                                    <th class="p-4 text-xs font-bold text-on-surface-variant uppercase cursor-pointer" onclick="sortProcessed('name')">Name <span id="psort-name" class="text-xs">▲</span></th>
+                                    <th class="p-4 text-xs font-bold text-on-surface-variant uppercase cursor-pointer" onclick="sortProcessed('dateOfJoining')">DOJ <span id="psort-dateOfJoining" class="text-xs"></span></th>
+                                    <th class="p-4 text-xs font-bold text-on-surface-variant uppercase cursor-pointer" onclick="sortProcessed('probationDurationMonths')">Duration <span id="psort-probationDurationMonths" class="text-xs"></span></th>
+                                    <th class="p-4 text-xs font-bold text-on-surface-variant uppercase cursor-pointer" onclick="sortProcessed('probationEndDate')">Probation End <span id="psort-probationEndDate" class="text-xs"></span></th>
+                                    <th class="p-4 text-xs font-bold text-on-surface-variant uppercase cursor-pointer" onclick="sortProcessed('probationProgress')">Progress <span id="psort-probationProgress" class="text-xs"></span></th>
+                                    <th class="p-4 text-xs font-bold text-on-surface-variant uppercase cursor-pointer" onclick="sortProcessed('taskCount')">Tasks <span id="psort-taskCount" class="text-xs"></span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="processed-tbody" class="divide-y divide-outline-variant">
+                                <tr><td colspan="7" class="p-8 text-center text-on-surface-variant italic">No processed associates found. HR needs to upload data first.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="processed-pagination" class="flex items-center justify-between mt-6 pt-4 border-t border-outline-variant"></div>
                 </div>
             </div>
 

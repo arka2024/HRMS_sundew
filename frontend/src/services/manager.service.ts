@@ -19,6 +19,7 @@ export interface Associate {
   };
   history: Array<{
     month: string;
+    monthKey?: string;
     tech: number;
     learn: number;
     adapt: number;
@@ -26,6 +27,7 @@ export interface Associate {
     comments: string;
     average: number;
     savedAt?: string;
+    locked?: boolean;
   }>;
   currentEvaluation: {
     tech: number;
@@ -37,6 +39,10 @@ export interface Associate {
     savedAt?: string;
   };
   averagePerformanceScore?: number;
+  evaluationLockedForMonth?: string;
+  syncedFromHr?: boolean;
+  department?: string;
+  totalHoursWorked?: number;
 }
 
 export interface ManagerDashboardData {

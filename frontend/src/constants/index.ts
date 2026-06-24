@@ -5,14 +5,19 @@ export const ROLES = {
 
 export const ROUTES = {
   LOGIN: '/login',
+  REGISTER: '/register',
   DASHBOARD: '/dashboard',
   HR: {
     DASHBOARD: '/hr/dashboard',
+    ASSOCIATE_UPLOAD: '/hr/associate-upload',
+    EMPLOYEE_UPLOAD: '/hr/employees/upload',
     EMPLOYEES: '/hr/employees',
     REPORTS: '/hr/reports',
   },
   MANAGER: {
     DASHBOARD: '/manager/dashboard',
+    ASSOCIATES: '/manager/associates',
+    EMPLOYEES: '/manager/employees',
     TEAM: '/manager/team',
     EVALUATIONS: '/manager/evaluations',
   },
@@ -28,6 +33,7 @@ export const API_URLS = {
   HR: import.meta.env.VITE_HR_API_URL || 'http://localhost:5001',
   MANAGER: import.meta.env.VITE_MANAGER_API_URL || 'http://localhost:5002',
   REPORT: import.meta.env.VITE_REPORT_API_URL || 'http://localhost:5003',
+  PROBATION: import.meta.env.VITE_PROBATION_API_URL || 'http://localhost:5004',
 };
 
 export function getDashboardRouteForRole(role: string): string {

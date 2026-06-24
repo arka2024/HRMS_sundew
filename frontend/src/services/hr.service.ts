@@ -65,12 +65,25 @@ export const hrService = {
     return apiRequest<{ documents: HrDocument[] }>(API_URLS.HR, '/api/documents', { token });
   },
 
-  uploadDocument(token: string, name: string, type?: string) {
-    return apiRequest<HrDocument>(API_URLS.HR, '/api/documents/upload', {
+  async uploadDocument(token: string, file: File): Promise<HrDocument> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'Document');
+
+    const response = await fetch(`${API_URLS.HR}/api/documents/upload`, {
       method: 'POST',
-      token,
-      body: JSON.stringify({ name, type }),
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
     });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to upload document');
+    }
+
+    return response.json();
   },
 
   getActivity(token: string) {

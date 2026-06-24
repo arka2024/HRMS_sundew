@@ -1,0 +1,687 @@
+/* Sundew Login — split layout with Three.js brand panel */
+
+:root {
+  --font-brand: 'Montserrat', 'Outfit', sans-serif;
+}
+
+.auth-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 500px);
+  background: #f4f7fb;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.auth-brand-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(24px, 4.5vw, 64px);
+  color: #f8fafc;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 85, 255, 0.18), transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(0, 40, 120, 0.35), transparent 50%),
+    linear-gradient(145deg, #050a14 0%, #0b192e 48%, #0f2342 100%);
+}
+
+.login-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.85;
+}
+
+.login-scene canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.auth-brand-content {
+  position: relative;
+  z-index: 1;
+  max-width: clamp(480px, 65vw, 780px);
+  width: 100%;
+  animation: authBrandFadeIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.auth-brand-logo {
+  width: clamp(48px, 5vw, 80px);
+  height: clamp(48px, 5vw, 80px);
+  object-fit: contain;
+  margin: 0 0 clamp(16px, 2vw, 28px);
+  filter: drop-shadow(0 0 18px rgba(0, 85, 255, 0.55));
+}
+
+.auth-brand-content h1 {
+  font-family: var(--font-brand, 'Montserrat', sans-serif);
+  font-size: clamp(1.75rem, 3.5vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 clamp(12px, 1.5vw, 20px);
+  color: #ffffff;
+}
+
+.auth-brand-content h1 .elevate-accent,
+.elevate-accent {
+  color: #66a3ff;
+  font-weight: 700;
+}
+
+.auth-brand-copy {
+  font-size: clamp(0.95rem, 1.2vw, 1.35rem);
+  line-height: 1.6;
+  color: rgba(226, 232, 240, 0.82);
+  margin: 0 0 clamp(24px, 3vw, 40px);
+  max-width: 600px;
+}
+
+.auth-brand-visual {
+  position: relative;
+  border-radius: clamp(12px, 1.5vw, 18px);
+  overflow: hidden;
+  margin-bottom: clamp(20px, 2.5vw, 36px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  aspect-ratio: 16 / 9;
+  width: min(100%, clamp(280px, 40vw, 650px));
+}
+
+.auth-brand-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(0.75) contrast(1.05) brightness(0.85);
+  transform: scale(1.02);
+  transition: transform 8s ease;
+}
+
+.auth-brand-panel:hover .auth-brand-visual img {
+  transform: scale(1.06);
+}
+
+.auth-brand-visual::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(5, 10, 20, 0.65) 100%);
+}
+
+.auth-brand-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 24px);
+  max-width: clamp(300px, 40vw, 700px);
+}
+
+.auth-brand-stat strong {
+  display: block;
+  font-size: clamp(1.4rem, 1.8vw, 2.5rem);
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: clamp(4px, 0.5vw, 8px);
+}
+
+.auth-brand-stat span {
+  font-size: clamp(0.7rem, 0.85vw, 0.82rem);
+  color: rgba(148, 163, 184, 0.95);
+  letter-spacing: 0.02em;
+}
+
+.auth-form-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(20px, 3.5vw, 48px);
+  position: relative;
+  background: #f4f7fb;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: clamp(320px, 45vw, 680px);
+  background: rgba(255, 255, 255, 0.881);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: clamp(16px, 1.5vw, 20px);
+  box-shadow:
+    0 4px 6px rgba(15, 23, 42, 0.04),
+    0 20px 50px rgba(15, 35, 66, 0.08);
+  padding: clamp(24px, 3.5vw, 40px);
+}
+
+.login-card-header {
+  margin-bottom: clamp(20px, 2.5vw, 28px);
+}
+
+.login-card-header h2 {
+  font-family: var(--font-headline);
+  font-size: clamp(1.35rem, 2vw, 1.65rem);
+  font-weight: 700;
+  color: #0b192e;
+  margin: 0 0 clamp(4px, 0.5vw, 8px);
+  letter-spacing: -0.02em;
+}
+
+.login-card-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: clamp(0.82rem, 0.95vw, 0.92rem);
+}
+
+.auth-tabs {
+  display: flex;
+  position: relative;
+  gap: 0;
+  margin-bottom: clamp(20px, 2.5vw, 28px);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.auth-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: clamp(10px, 1.2vw, 12px) clamp(6px, 0.8vw, 8px) clamp(12px, 1.4vw, 14px);
+  font-size: clamp(0.65rem, 0.75vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.25s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-tab:hover {
+  color: #475569;
+}
+
+.auth-tab.active {
+  color: #0b192e;
+}
+
+.auth-tab-indicator {
+  position: absolute;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, #0055ff, #0033cc);
+  border-radius: 2px 2px 0 0;
+  z-index: 2;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.login-field {
+  margin-bottom: clamp(16px, 2vw, 20px);
+}
+
+.login-field label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: clamp(0.7rem, 0.8vw, 0.78rem);
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: clamp(6px, 0.8vw, 8px);
+}
+
+.login-field label a {
+  font-size: clamp(0.7rem, 0.8vw, 0.78rem);
+  font-weight: 500;
+  color: #0055ff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.login-field label a:hover {
+  color: #0033cc;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+.input-wrap input {
+  width: 100%;
+  padding: clamp(11px, 1.3vw, 13px) clamp(38px, 4.5vw, 44px) clamp(11px, 1.3vw, 13px) clamp(12px, 1.4vw, 14px);
+  border: 1px solid #e2e8f0;
+  border-radius: clamp(8px, 1vw, 10px);
+  font-size: clamp(0.85rem, 0.95vw, 0.92rem);
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.input-wrap input::placeholder {
+  color: #94a3b8;
+}
+
+.input-wrap input:focus {
+  border-color: #0055ff;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 85, 255, 0.12);
+}
+
+.input-icon {
+  position: absolute;
+  right: clamp(12px, 1.4vw, 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon.clickable {
+  pointer-events: auto;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px;
+  transition: color 0.2s ease;
+}
+
+.input-icon.clickable:hover {
+  color: #0055ff;
+}
+
+.login-options {
+  display: flex;
+  align-items: center;
+  margin-bottom: clamp(18px, 2.2vw, 24px);
+}
+
+.remember-label {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(8px, 1vw, 10px);
+  font-size: clamp(0.78rem, 0.9vw, 0.85rem);
+  color: #475569;
+  cursor: pointer;
+  user-select: none;
+}
+
+.remember-label input {
+  width: clamp(14px, 1.6vw, 16px);
+  height: clamp(14px, 1.6vw, 16px);
+  accent-color: #0055ff;
+  cursor: pointer;
+}
+
+.login-submit {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1vw, 10px);
+  padding: clamp(12px, 1.4vw, 14px) clamp(16px, 2vw, 20px);
+  border: none;
+  border-radius: clamp(8px, 1vw, 10px);
+  background: linear-gradient(135deg, #0055ff 0%, #0033cc 100%);
+  color: #ffffff;
+  font-size: clamp(0.85rem, 0.95vw, 0.92rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    opacity 0.25s ease;
+  box-shadow: 0 10px 24px rgba(0, 85, 255, 0.28);
+}
+
+.login-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 32px rgba(0, 85, 255, 0.35);
+}
+
+.login-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.login-submit svg {
+  transition: transform 0.25s ease;
+}
+
+.login-submit:hover:not(:disabled) svg {
+  transform: translateX(3px);
+}
+
+.login-card-footer {
+  margin-top: clamp(20px, 2.5vw, 28px);
+  padding-top: clamp(16px, 2vw, 20px);
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(8px, 1vw, 12px) clamp(12px, 1.5vw, 16px);
+  justify-content: center;
+}
+
+.login-card-footer a {
+  font-size: clamp(0.72rem, 0.8vw, 0.78rem);
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.login-card-footer a:hover {
+  color: #0055ff;
+}
+
+.login-card-footer span {
+  font-size: clamp(0.68rem, 0.75vw, 0.72rem);
+  color: #94a3b8;
+  width: 100%;
+  text-align: center;
+  margin-top: clamp(2px, 0.3vw, 4px);
+}
+
+.demo-credentials {
+  margin-top: clamp(18px, 2.2vw, 24px);
+  padding: clamp(12px, 1.5vw, 16px);
+  border-radius: clamp(10px, 1.2vw, 12px);
+  background: linear-gradient(135deg, rgba(0, 85, 255, 0.04), rgba(0, 51, 204, 0.06));
+  border: 1px solid rgba(0, 85, 255, 0.1);
+}
+
+.demo-credentials p {
+  font-size: clamp(0.65rem, 0.72vw, 0.72rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  margin: 0 0 clamp(8px, 1vw, 12px);
+}
+
+.demo-credentials-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(8px, 1vw, 10px);
+}
+
+.demo-chip {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: clamp(8px, 1vw, 10px);
+  padding: clamp(8px, 1vw, 10px) clamp(10px, 1.2vw, 12px);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.demo-chip:hover {
+  border-color: rgba(0, 85, 255, 0.35);
+  box-shadow: 0 6px 16px rgba(0, 85, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.demo-chip-role {
+  display: block;
+  font-size: clamp(0.7rem, 0.8vw, 0.78rem);
+  font-weight: 700;
+  color: #0b192e;
+  margin-bottom: clamp(1px, 0.2vw, 2px);
+}
+
+.demo-chip-email {
+  display: block;
+  font-size: clamp(0.62rem, 0.7vw, 0.68rem);
+  color: #64748b;
+}
+
+.register-error {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: clamp(8px, 1vw, 10px);
+  padding: clamp(10px, 1.2vw, 12px);
+  margin-bottom: clamp(16px, 2vw, 20px);
+  color: #dc2626;
+  font-size: clamp(0.8rem, 0.9vw, 0.85rem);
+  text-align: center;
+}
+
+.google-signin-button {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1vw, 12px);
+  padding: clamp(11px, 1.3vw, 13px) clamp(16px, 2vw, 20px);
+  border: 1px solid #e2e8f0;
+  border-radius: clamp(8px, 1vw, 10px);
+  background: #ffffff;
+  color: #334155;
+  font-size: clamp(0.85rem, 0.95vw, 0.92rem);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+  margin-bottom: clamp(14px, 1.8vw, 18px);
+}
+
+.google-signin-button:hover:not(:disabled) {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.google-signin-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.google-signin-button svg {
+  width: clamp(18px, 2vw, 20px);
+  height: clamp(18px, 2vw, 20px);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 1.5vw, 16px);
+  margin: clamp(16px, 2vw, 20px) 0;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.divider span {
+  font-size: clamp(0.72rem, 0.85vw, 0.8rem);
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.auth-page-footer {
+  width: 100%;
+  max-width: 440px;
+  margin-top: 24px;
+  padding-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.auth-page-footer-brand {
+  font-weight: 700;
+  color: #0b192e;
+  font-family: var(--font-headline);
+}
+
+.auth-page-footer-links {
+  display: flex;
+  gap: 16px;
+}
+
+.auth-page-footer-links a {
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.auth-page-footer-links a:hover {
+  color: #0055ff;
+}
+
+@keyframes authBrandFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .auth-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 440px);
+  }
+}
+
+@media (max-width: 960px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-brand-panel {
+    min-height: clamp(240px, 30vh, 280px);
+    padding: clamp(28px, 4vw, 40px) clamp(20px, 3vw, 28px);
+  }
+
+  .auth-brand-visual,
+  .auth-brand-stats {
+    display: none;
+  }
+
+  .auth-brand-copy {
+    margin-bottom: 0;
+    font-size: clamp(0.85rem, 1.1vw, 0.95rem);
+  }
+
+  .auth-form-panel {
+    padding-top: 0;
+    margin-top: clamp(-32px, -4vw, -40px);
+    z-index: 2;
+    padding-left: clamp(12px, 2vw, 16px);
+    padding-right: clamp(12px, 2vw, 16px);
+  }
+
+  .auth-card {
+    max-width: 100%;
+  }
+
+  .auth-page-footer {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .auth-page-footer-links {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .auth-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .auth-brand-panel {
+    min-height: clamp(200px, 25vh, 240px);
+    padding: clamp(24px, 4vw, 32px) clamp(16px, 3vw, 20px);
+  }
+
+  .auth-brand-logo {
+    width: clamp(40px, 5vw, 48px);
+    height: clamp(40px, 5vw, 48px);
+    margin-bottom: clamp(12px, 1.5vw, 16px);
+  }
+
+  .auth-brand-content h1 {
+    font-size: clamp(1.5rem, 4vw, 1.85rem);
+    margin-bottom: clamp(8px, 1vw, 12px);
+  }
+
+  .auth-brand-copy {
+    font-size: clamp(0.8rem, 1.2vw, 0.9rem);
+    max-width: 100%;
+  }
+
+  .auth-form-panel {
+    padding: clamp(16px, 2.5vw, 20px) clamp(12px, 2vw, 16px);
+    margin-top: clamp(-24px, -3vw, -32px);
+  }
+
+  .auth-card {
+    border-radius: clamp(12px, 1.5vw, 16px);
+    padding: clamp(18px, 2.5vw, 24px) clamp(14px, 2vw, 16px);
+  }
+
+  .login-card-header {
+    margin-bottom: clamp(16px, 2vw, 20px);
+  }
+
+  .login-card-header h2 {
+    font-size: clamp(1.2rem, 2.5vw, 1.4rem);
+  }
+
+  .auth-tabs {
+    margin-bottom: clamp(16px, 2vw, 20px);
+  }
+
+  .auth-tab {
+    font-size: clamp(0.58rem, 0.7vw, 0.65rem);
+    padding: clamp(8px, 1vw, 10px) clamp(4px, 0.6vw, 6px) clamp(10px, 1.2vw, 12px);
+  }
+
+  .login-field {
+    margin-bottom: clamp(12px, 1.5vw, 16px);
+  }
+
+  .demo-credentials {
+    margin-top: clamp(16px, 2vw, 20px);
+    padding: clamp(10px, 1.2vw, 12px);
+  }
+
+  .demo-credentials-grid {
+    grid-template-columns: 1fr;
+  }
+}

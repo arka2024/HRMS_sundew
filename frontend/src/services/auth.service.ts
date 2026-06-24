@@ -10,6 +10,13 @@ export const authService = {
     });
   },
 
+  async register(name: string, email: string, password: string, role: string): Promise<AuthResponse> {
+    return apiRequest<AuthResponse>(API_URLS.AUTH, '/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password, role }),
+    });
+  },
+
   async getCurrentUser(token: string): Promise<User | null> {
     try {
       const data = await apiRequest<{ user: User | null }>(API_URLS.AUTH, '/me', { token });

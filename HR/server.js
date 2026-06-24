@@ -3,6 +3,8 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import multer from 'multer';
+import xlsx from 'xlsx';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,6 +16,22 @@ const DB_PATH = path.join(__dirname, 'db.json');
 app.use(cors());
 app.use(express.json());
 
+// Configure multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['.csv', '.xlsx', '.xls'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowedTypes.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only CSV and Excel files are allowed'));
+    }
+  }
+});
+
 const defaultAssociates = [
   {
     "id": "sarah-chen",
@@ -21,6 +39,7 @@ const defaultAssociates = [
     "employeeId": "HR-2024-001",
     "joinDate": "Jan 15, 2024",
     "manager": "Sarah Thompson",
+    "managerId": "manager-001",
     "probation": "Month 3/4",
     "status": "On Track",
     "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuDwipckJtsRT5jNcB8fC-YO9nro0-sHfX5b-wHB0PiDgmggS0rEbG1ibzJBPRomUWqEOSwX1RT6nyzNG8eA5jikqUWz5r6529vATPHcNd1x5l3oHRDG_eKPube8i5Cwk1Ixe_TUiO22aMsiLNw7oBgQ8eOBU9yYGE5aA8H2Bxx9pxOezlYEl2gvHaJgU3CYmVPao6JXvxzFzrq9w__LPY6DIyomULj_58TZz4Dgnpc7kuhU15ymf8o0HZ4W9UGoyG1eGdLtadBtNpY",
@@ -49,6 +68,7 @@ const defaultAssociates = [
     "employeeId": "HR-2024-002",
     "joinDate": "Feb 1, 2024",
     "manager": "Sarah Thompson",
+    "managerId": "manager-001",
     "probation": "Month 2/4",
     "status": "Needs Improvement",
     "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200",
@@ -75,6 +95,7 @@ const defaultAssociates = [
     "employeeId": "HR-2024-003",
     "joinDate": "Mar 10, 2024",
     "manager": "Marcus Vance",
+    "managerId": "manager-002",
     "probation": "Month 1/4",
     "status": "On Track",
     "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200",
@@ -99,6 +120,7 @@ const defaultAssociates = [
     "employeeId": "HR-2024-004",
     "joinDate": "Nov 12, 2023",
     "manager": "Elena Vance",
+    "managerId": "manager-003",
     "probation": "Month 4/4",
     "status": "On Track",
     "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
@@ -265,6 +287,135 @@ app.post('/api/reset', (req, res) => {
   writeDb(defaultAssociates);
   res.json({ message: "Database reset to defaults successfully" });
 });
+
+// Sync tasks endpoint for HR portal
+app.post('/api/associates/sync-tasks', (req, res) => {
+  try {
+    const db = readDb();
+    res.json({ 
+      message: "Data synced successfully", 
+      associates: db,
+      total: db.length 
+    });
+  } catch (error) {
+    console.error("Sync error:", error);
+    res.status(500).json({ error: "Failed to sync data: " + error.message });
+  }
+});
+
+// File upload endpoint for associates
+app.post('/api/associates/upload', upload.single('file'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    let associates = [];
+    const fileBuffer = req.file.buffer;
+    const originalName = req.file.originalname;
+    const ext = path.extname(originalName).toLowerCase();
+
+    if (ext === '.csv') {
+      // Parse CSV
+      const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = xlsx.utils.sheet_to_json(worksheet);
+      associates = parseAssociateData(jsonData);
+    } else if (ext === '.xlsx' || ext === '.xls') {
+      // Parse Excel
+      const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = xlsx.utils.sheet_to_json(worksheet);
+      associates = parseAssociateData(jsonData);
+    }
+
+    if (associates.length === 0) {
+      return res.status(400).json({ error: "No valid associate data found in file" });
+    }
+
+    // Update database with new associates
+    const db = readDb();
+    let addedCount = 0;
+    let updatedCount = 0;
+
+    associates.forEach(associate => {
+      const existingIndex = db.findIndex(a => a.employeeId === associate.employeeId);
+      if (existingIndex !== -1) {
+        // Update existing associate
+        db[existingIndex] = { ...db[existingIndex], ...associate, syncedFromHr: true };
+        updatedCount++;
+      } else {
+        // Add new associate
+        associate.syncedFromHr = true;
+        db.push(associate);
+        addedCount++;
+      }
+    });
+
+    writeDb(db);
+    res.json({
+      message: "File processed successfully",
+      added: addedCount,
+      updated: updatedCount,
+      total: associates.length
+    });
+  } catch (error) {
+    console.error("File upload error:", error);
+    res.status(500).json({ error: "Failed to process file: " + error.message });
+  }
+});
+
+// Helper function to parse associate data from uploaded file
+function parseAssociateData(data) {
+  return data.map((row, index) => {
+    const name = row['Name'] || row['name'] || row['Employee Name'] || '';
+    const employeeId = row['Employee ID'] || row['employeeId'] || row['EmployeeId'] || '';
+    const joinDate = row['Join Date'] || row['joinDate'] || row['JoinDate'] || new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    const manager = row['Manager'] || row['manager'] || 'Sarah Thompson';
+    const probation = row['Probation'] || row['probation'] || 'Month 1/4';
+    const projectName = row['Project'] || row['project'] || row['Project Name'] || 'New Assignment';
+    const projectPhase = row['Phase'] || row['phase'] || row['Project Phase'] || 'Onboarding';
+    
+    // Generate ID from name
+    const id = name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now() + '-' + index;
+    
+    // Get or generate managerId based on manager name
+    const managerIdMap = {
+      'Sarah Thompson': 'manager-001',
+      'Marcus Vance': 'manager-002',
+      'Elena Vance': 'manager-003'
+    };
+    const managerId = managerIdMap[manager] || 'manager-001';
+
+    return {
+      id,
+      name,
+      employeeId,
+      joinDate,
+      manager,
+      managerId,
+      probation,
+      status: "On Track",
+      avatar: "https://ui-avatars.com/api/?name=" + encodeURIComponent(name) + "&background=random",
+      project: {
+        name: projectName,
+        phase: projectPhase,
+        progress: 0,
+        status: "Healthy"
+      },
+      history: [],
+      currentEvaluation: {
+        tech: 3,
+        learn: 3,
+        adapt: 3,
+        attitude: 3,
+        comments: ""
+      }
+    };
+  }).filter(assoc => assoc.name && assoc.employeeId); // Filter out invalid entries
+}
 
 app.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`);

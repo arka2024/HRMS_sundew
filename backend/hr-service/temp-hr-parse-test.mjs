@@ -1,0 +1,10 @@
+import fs from 'fs';
+const filePath = '\\\\SUNDEW-ADSERVER\\users data\\arkabrata.roy\\Downloads\\Timesheet Report-May Month (Sample)_Probation Associates.xlsx';
+const buffer = fs.readFileSync(filePath);
+const parser = await import(new URL('./lib/employee-parser.js', import.meta.url));
+const rows = await parser.parseEmployeeUploadFile({ originalname: filePath, buffer });
+console.log('rows', rows.length);
+console.log(rows.slice(0, 5));
+const result = parser.processEmployeeRows(rows);
+console.log('successful', result.successfulRecords.length, 'failed', result.failedRecords.length);
+console.log(result.failedRecords.slice(0, 5));

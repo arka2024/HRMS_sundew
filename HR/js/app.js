@@ -1184,3 +1184,112 @@ function triggerQuickAction(actionType) {
     addNotification(`Email composer launched for ${name}`, "success");
   }
 }
+
+// File upload handling for associates
+let selectedAssociateFile = null;
+
+function onAssociateFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) {
+    selectedAssociateFile = file;
+    const fileName = file.name;
+    const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+    
+    // Update UI to show selected file
+    const uploadZone = document.getElementById('associateUploadZone');
+    uploadZone.innerHTML = `
+      <div class="mb-4">
+        <svg class="mx-auto w-16 h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">File Selected</h3>
+      <p class="text-sm text-gray-600 font-medium">${fileName}</p>
+      <p class="text-xs text-gray-500 mt-1">Size: ${fileSize} MB</p>
+      <button onclick="clearSelectedFile()" class="mt-4 text-sm text-red-600 hover:text-red-700 font-medium">Clear Selection</button>
+    `;
+  }
+}
+
+function clearSelectedFile() {
+  selectedAssociateFile = null;
+  document.getElementById('associate-file-input').value = '';
+  const uploadZone = document.getElementById('associateUploadZone');
+  uploadZone.innerHTML = `
+    <div class="mb-4">
+      <svg class="mx-auto w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+    </div>
+    <h3 class="text-lg font-semibold text-gray-900 mb-2">Drop files here to upload</h3>
+    <p class="text-sm text-gray-600">or <span class="text-blue-600 font-semibold">browse your computer</span> (Max 50MB per file)</p>
+    <div class="flex flex-wrap justify-center gap-2 mt-4">
+      <span class="file-type-chip">CSV</span>
+      <span class="file-type-chip">XLSX</span>
+      <span class="file-type-chip">XLS</span>
+    </div>
+  `;
+}
+
+async function uploadAssociates() {
+  if (!selectedAssociateFile) {
+    alert('Please select a file first.');
+    return;
+  }
+
+  const uploadError = document.getElementById('uploadError');
+  const uploadLoading = document.getElementById('uploadLoading');
+  const btnUpload = document.getElementById('btnUpload');
+  const btnSync = document.getElementById('btnSync');
+
+  // Show loading state
+  uploadError.classList.add('hidden');
+  uploadLoading.classList.remove('hidden');
+  btnUpload.disabled = true;
+  btnSync.disabled = true;
+  btnUpload.classList.add('opacity-50');
+  btnSync.classList.add('opacity-50');
+
+  try {
+    const formData = new FormData();
+    formData.append('file', selectedAssociateFile);
+
+    const response = await fetch('/api/associates/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Upload failed');
+    }
+
+    // Success
+    addNotification(`File processed successfully: ${result.added} added, ${result.updated} updated`, 'success');
+    
+    // Refresh associates list
+    await fetchAssociates();
+    
+    // Clear file selection
+    clearSelectedFile();
+    
+    // Switch to associates tab to show results
+    switchTab('associates');
+    
+  } catch (error) {
+    console.error('Upload error:', error);
+    uploadError.textContent = error.message || 'Failed to upload file. Please try again.';
+    uploadError.classList.remove('hidden');
+    addNotification('Upload failed: ' + error.message, 'error');
+  } finally {
+    // Hide loading state
+    uploadLoading.classList.add('hidden');
+    btnUpload.disabled = false;
+    btnSync.disabled = false;
+    btnUpload.classList.remove('opacity-50');
+    btnSync.classList.remove('opacity-50');
+  }
+}
+
+function syncTasks() {
+  // Refresh data from server
+  fetchAssociates();
+  addNotification('Data synced successfully', 'success');
+}

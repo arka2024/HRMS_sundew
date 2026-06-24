@@ -1,61 +1,78 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { Card } from '../../components/Card';
 import { Button } from '../../components/Button';
 import { Table } from '../../components/Table';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { ServiceError } from '../../components/ServiceError';
+import { HrQuickAccessPanel } from '../../components/hr/HrQuickAccessPanel';
+import { HrEmployeeSyncPanel } from '../../components/hr/HrEmployeeSyncPanel';
+import { MonthlyDocumentTally } from '../../components/hr/MonthlyDocumentTally';
 import { useAuth } from '../../contexts/AuthContext';
-import { hrService, type HrDocument, type HrActivity, type HrStorageStats } from '../../services/hr.service';
+import { useNavigate } from 'react-router-dom';
+import { hrService, type HrDocument, type HrActivity } from '../../services/hr.service';
+import { evaluationReportService, type EvaluationDashboardStats } from '../../services/evaluation-report.service';
 
-const ACCEPTED_FILE_TYPES = [
-  '.pdf',
-  '.doc',
-  '.docx',
-  '.xls',
-  '.xlsx',
-  '.ppt',
-  '.pptx',
-  '.csv',
-  '.txt',
-  '.png',
-  '.jpg',
-  '.jpeg',
-  '.zip',
-].join(',');
+function getFileIcon(type: string) {
+  if (type.includes('PDF')) return { icon: 'picture_as_pdf', color: '#ef4444' };
+  if (type.includes('Word')) return { icon: 'description', color: '#3b82f6' };
+  if (type.includes('Excel')) return { icon: 'table_chart', color: '#10b981' };
+  if (type.includes('Image') || type.includes('Media')) return { icon: 'image', color: '#8b5cf6' };
+  if (type.includes('CSV')) return { icon: 'csv', color: '#14b8a6' };
+  if (type.includes('Zip')) return { icon: 'folder_zip', color: '#f59e0b' };
+  return { icon: 'draft', color: 'var(--text-muted)' };
+}
+
+function getActivityIcon(action: string) {
+  if (action === 'uploaded') return 'upload_file';
+  if (action.includes('imported employees')) return 'group_add';
+  if (action.includes('deleted')) return 'delete';
+  if (action.includes('updated')) return 'edit_document';
+  return 'download';
+}
 
 export function HrDashboardPage() {
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   const [documents, setDocuments] = useState<HrDocument[]>([]);
   const [activities, setActivities] = useState<HrActivity[]>([]);
-  const [storage, setStorage] = useState<HrStorageStats | null>(null);
+  const [evaluationStats, setEvaluationStats] = useState<EvaluationDashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState('all');
 
-  function loadDashboardData() {
+  async function loadDashboardData() {
     setIsLoading(true);
     setError(null);
 
-    Promise.all([
-      hrService.getDocuments(token!),
-      hrService.getActivity(token!),
-      hrService.getStorage(token!),
-    ])
-      .then(([docsData, activityData, storageData]) => {
+    try {
+      // Load documents
+      try {
+        const docsData = await hrService.getDocuments(token!);
         setDocuments(docsData.documents);
+      } catch (err) {
+        console.error('Failed to load documents:', err);
+      }
+
+      // Load activity
+      try {
+        const activityData = await hrService.getActivity(token!);
         setActivities(activityData.activities);
-        setStorage(storageData.storage);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error('Failed to load HR dashboard data:', err);
-        setError('Failed to connect to HR Service backend.');
-        setIsLoading(false);
-      });
+      } catch (err) {
+        console.error('Failed to load activity:', err);
+      }
+
+      // Load evaluation stats
+      try {
+        const evalStats = await evaluationReportService.getDashboardStats(token!);
+        setEvaluationStats(evalStats);
+      } catch (err) {
+        console.error('Failed to load evaluation stats:', err);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -65,64 +82,25 @@ export function HrDashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
-  // Drag and drop handlers
-  function handleDragOver(e: React.DragEvent) {
-    e.preventDefault();
-    setIsDragging(true);
-  }
-
-  // Drag and drop handlers
-  function handleDragLeave() {
-    setIsDragging(false);
-  }
-
-  async function handleDrop(e: React.DragEvent) {
-    e.preventDefault();
-    setIsDragging(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      await uploadFiles(files);
-    }
-  }
-
-  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      await uploadFiles(files);
-    }
-    e.target.value = '';
-  }
-
-  async function uploadFiles(files: File[]) {
-    setIsUploading(true);
-    const toastId = toast.loading(`Uploading ${files.length} file${files.length === 1 ? '' : 's'}...`);
-
-    try {
-      await Promise.all(files.map((file) => hrService.uploadDocument(token!, file.name)));
-      toast.success(`${files.length} file${files.length === 1 ? '' : 's'} uploaded successfully!`, { id: toastId });
-      loadDashboardData(); // Refresh stats and list
-    } catch {
-      toast.error('Failed to upload one or more documents.', { id: toastId });
-    } finally {
-      setIsUploading(false);
-    }
-  }
-
   function handleDownload(docName: string) {
     toast.success(`Downloading ${docName}...`);
   }
 
-  function handleDownloadAll() {
-    toast.success('Archiving and downloading all documents...');
-  }
+  const DATE_FILTERS = [
+    { id: 'today', label: 'Today' },
+    { id: 'last7days', label: 'Last 7 Days' },
+    { id: 'last30days', label: 'Last 30 Days' },
+    { id: 'custom', label: 'Custom Range' },
+    { id: 'monthly', label: 'Monthly' },
+    { id: 'quarterly', label: 'Quarterly' },
+    { id: 'yearly', label: 'Yearly' },
+  ];
 
-  function handleExportFiles() {
-    toast.success('Exporting file index and history...');
-  }
+  const filteredDocuments = documents.slice(0, 10);
+  const filteredActivities = activities.slice(0, 10);
 
   if (isLoading) {
-    return <LoadingSpinner message="Loading Document Workspace..." />;
+    return <LoadingSpinner message="Loading Sundew Elevate workspace..." />;
   }
 
   if (error) {
@@ -130,249 +108,244 @@ export function HrDashboardPage() {
   }
 
   return (
-    <div className="hr-grid">
-      {/* Left Column: Doc upload and list */}
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+    <div className="hr-dashboard-layout">
+      <div className="hr-dashboard-main">
+        <motion.div
+          className="hr-page-header"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0 }}>Document Management</h2>
-            <p style={{ color: 'var(--text-muted)', margin: '4px 0 0', fontSize: '0.9rem' }}>
-              Manage organization policies, contracts, and employee handbooks.
-            </p>
+            <h2>HR Dashboard</h2>
+            <p>Manage employee evaluations and HR operations.</p>
           </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <Button type="button" variant="outline" onClick={handleDownloadAll}>
-              Download All
-            </Button>
-            <Button type="button" variant="outline" onClick={handleExportFiles}>
-              <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>download</span>
-              Export Files
-            </Button>
-            <label className="btn btn-primary" style={{ cursor: 'pointer' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '1rem' }}>upload</span>
-              Upload Files
-              <input type="file" multiple accept={ACCEPTED_FILE_TYPES} onChange={handleFileSelect} style={{ display: 'none' }} />
-            </label>
-          </div>
-        </div>
+        </motion.div>
 
-        <Card style={{ padding: '24px', marginBottom: '24px' }}>
-          <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            className={`file-upload-zone ${isDragging ? 'drag-over' : ''}`}
-            onClick={() => {
-              const fileInput = document.getElementById('click-file-upload');
-              if (fileInput) fileInput.click();
-            }}
-          >
-            <input
-              type="file"
-              id="click-file-upload"
-              multiple
-              accept={ACCEPTED_FILE_TYPES}
-              onChange={handleFileSelect}
-              style={{ display: 'none' }}
-            />
-            {isUploading ? (
-              <div className="spinner" style={{ width: '36px', height: '36px' }}></div>
-            ) : (
-              <span className="material-symbols-outlined file-upload-icon">cloud_upload</span>
-            )}
-            <h3 className="file-upload-title">Drop files here to upload</h3>
-            <p className="file-upload-subtitle">
-              or <span style={{ color: 'var(--primary)', fontWeight: 600 }}>browse your computer</span> (Max 50MB per file)
-            </p>
-            <div className="file-type-chips" aria-label="Accepted file types">
-              {['PDF', 'DOCX', 'XLSX', 'PPT', 'CSV', 'Images', 'ZIP'].map((type) => (
-                <span key={type}>{type}</span>
-              ))}
+        {/* Evaluation Reports Card */}
+        <motion.div
+          className="elevate-panel"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="panel-header">
+            <h3>Evaluation Reports</h3>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    await evaluationReportService.seedEvaluations(token!);
+                    toast.success('Evaluations seeded successfully!');
+                    loadDashboardData();
+                  } catch (err) {
+                    toast.error('Failed to seed evaluations');
+                    console.error(err);
+                  }
+                }}
+              >
+                Seed Data
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/hr/evaluation-reports')}
+              >
+                View All Reports
+              </Button>
             </div>
           </div>
-        </Card>
+          <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+            <div className="stat-item">
+              <div className="stat-value">{evaluationStats?.totalEvaluatedEmployees || 0}</div>
+              <div className="stat-label">Total Evaluated</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-value">{evaluationStats?.pendingEvaluations || 0}</div>
+              <div className="stat-label">Pending</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-value">{evaluationStats?.lockedEvaluationCycles || 0}</div>
+              <div className="stat-label">Locked Cycles</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-value">{evaluationStats?.averageRating?.toFixed(2) || '0.00'}</div>
+              <div className="stat-label">Avg Rating</div>
+            </div>
+          </div>
+        </motion.div>
 
-        <Card>
+        <MonthlyDocumentTally />
+
+        <motion.div
+          className="elevate-panel elevate-documents-panel"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div className="panel-header">
-            <h3>Recent Documents</h3>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="panel-header-left">
+              <h3>Recent Documents</h3>
+              <div className="date-filters">
+                {DATE_FILTERS.map((filter) => (
+                  <button
+                    key={filter.id}
+                    type="button"
+                    className={`date-filter-btn ${selectedFilter === filter.id ? 'active' : ''}`}
+                    onClick={() => setSelectedFilter(filter.id)}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <button type="button" className="top-navbar-btn" style={{ width: '32px', height: '32px' }}>
                 <span className="material-symbols-outlined">view_list</span>
               </button>
               <button type="button" className="top-navbar-btn" style={{ width: '32px', height: '32px' }}>
                 <span className="material-symbols-outlined">view_comfy</span>
               </button>
+              <button
+                type="button"
+                className="view-all-link"
+                onClick={() => toast.success('Opening full document history...')}
+              >
+                View All
+              </button>
             </div>
           </div>
 
           <Table<HrDocument>
-            data={documents}
+            data={filteredDocuments}
             keyExtractor={(doc) => doc.id}
             onRowClick={(doc) => handleDownload(doc.name)}
             columns={[
               {
                 header: 'Name',
                 accessor: (doc) => {
-                  let fileIcon = 'draft';
-                  let iconColor = 'var(--text-muted)';
-                  
-                  if (doc.type.includes('PDF')) {
-                    fileIcon = 'picture_as_pdf';
-                    iconColor = '#ef4444';
-                  } else if (doc.type.includes('Word')) {
-                    fileIcon = 'description';
-                    iconColor = '#3b82f6';
-                  } else if (doc.type.includes('Excel')) {
-                    fileIcon = 'table_chart';
-                    iconColor = '#10b981';
-                  } else if (doc.type.includes('Image') || doc.type.includes('Media')) {
-                    fileIcon = 'image';
-                    iconColor = '#8b5cf6';
-                  } else if (doc.type.includes('CSV')) {
-                    fileIcon = 'csv';
-                    iconColor = '#14b8a6';
-                  } else if (doc.type.includes('Zip')) {
-                    fileIcon = 'folder_zip';
-                    iconColor = '#f59e0b';
-                  }
-
+                  const { icon, color } = getFileIcon(doc.type);
                   return (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span className="material-symbols-outlined" style={{ color: iconColor }}>{fileIcon}</span>
+                      <span className="material-symbols-outlined" style={{ color }}>
+                        {icon}
+                      </span>
                       <strong style={{ fontWeight: 600, color: 'var(--text)' }}>{doc.name}</strong>
                     </div>
                   );
-                }
+                },
               },
               {
                 header: 'Type',
-                accessor: (doc) => <span style={{ color: 'var(--text-muted)' }}>{doc.type}</span>
+                accessor: (doc) => <span style={{ color: 'var(--text-muted)' }}>{doc.type}</span>,
               },
               {
                 header: 'Date Added',
-                accessor: (doc) => <span style={{ color: 'var(--text-muted)' }}>{doc.dateAdded}</span>
+                accessor: (doc) => <span style={{ color: 'var(--text-muted)' }}>{doc.dateAdded}</span>,
               },
               {
                 header: 'Owner',
                 accessor: (doc) => (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {doc.avatar ? (
-                      <img src={doc.avatar} alt={doc.owner} style={{ width: '22px', height: '22px', borderRadius: '50%' }} />
+                      <img
+                        src={doc.avatar}
+                        alt={doc.owner}
+                        style={{ width: '22px', height: '22px', borderRadius: '50%' }}
+                      />
                     ) : (
-                      <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'var(--primary)', color: 'white', fontSize: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                      <div
+                        style={{
+                          width: '22px',
+                          height: '22px',
+                          borderRadius: '50%',
+                          background: 'var(--primary)',
+                          color: 'white',
+                          fontSize: '0.65rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 'bold',
+                        }}
+                      >
                         {doc.owner.charAt(0)}
                       </div>
                     )}
                     <span style={{ fontSize: '0.85rem' }}>{doc.owner}</span>
                   </div>
-                )
-              }
+                ),
+              },
             ]}
           />
-        </Card>
+        </motion.div>
       </div>
 
-      {/* Right Column: stats, activity feed, promo */}
-      <div>
-        {storage && (
-          <Card>
-            <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '16px' }}>Storage Statistics</h3>
-            
-            <div style={{ marginBottom: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 600, marginBottom: '6px' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Total Used</span>
-                <span>{storage.used.toFixed(1)} GB / {storage.limit} GB</span>
-              </div>
-              <div className="progress-bar-wrap">
-                <div className="progress-bar" style={{ width: `${(storage.used / storage.limit) * 100}%` }}></div>
-              </div>
-            </div>
+      <aside className="hr-dashboard-sidebar">
+        <HrEmployeeSyncPanel />
+        <HrQuickAccessPanel />
 
-            <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-              <Card style={{ flex: 1, padding: '12px', marginBottom: 0, background: 'var(--bg)' }}>
-                <span className="slider-label" style={{ fontSize: '0.65rem' }}>Documents</span>
-                <strong style={{ display: 'block', fontSize: '1.2rem', marginTop: '4px' }}>{storage.documentsCount}</strong>
-              </Card>
-              <Card style={{ flex: 1, padding: '12px', marginBottom: 0, background: 'var(--bg)' }}>
-                <span className="slider-label" style={{ fontSize: '0.65rem' }}>Media</span>
-                <strong style={{ display: 'block', fontSize: '1.2rem', marginTop: '4px' }}>{storage.mediaCount}</strong>
-              </Card>
-            </div>
-
-            <div className="storage-stats-categories">
-              <div className="storage-category-item">
-                <div className="storage-category-label">
-                  <span className="storage-category-dot" style={{ background: 'var(--primary)' }}></span>
-                  <span style={{ color: 'var(--text-muted)' }}>Legal & Contracts</span>
-                </div>
-                <span className="storage-category-val">{storage.legal.toFixed(1)} GB</span>
-              </div>
-              <div className="storage-category-item">
-                <div className="storage-category-label">
-                  <span className="storage-category-dot" style={{ background: 'var(--secondary)' }}></span>
-                  <span style={{ color: 'var(--text-muted)' }}>Internal Policies</span>
-                </div>
-                <span className="storage-category-val">{storage.policies.toFixed(1)} GB</span>
-              </div>
-              <div className="storage-category-item">
-                <div className="storage-category-label">
-                  <span className="storage-category-dot" style={{ background: 'var(--success)' }}></span>
-                  <span style={{ color: 'var(--text-muted)' }}>Employee Records</span>
-                </div>
-                <span className="storage-category-val">{storage.records.toFixed(1)} GB</span>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        <Card style={{ marginTop: '24px' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '20px' }}>File History</h3>
-          
+        <motion.div
+          className="elevate-panel elevate-activity-feed"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="panel-header">
+            <h3>Recent Activity</h3>
+            <button
+              type="button"
+              className="view-all-link"
+              onClick={() => toast.success('Opening full activity history...')}
+            >
+              View All
+            </button>
+          </div>
           <div className="activity-stream">
-            {activities.map((act) => (
+            {filteredActivities.map((act) => (
               <div key={act.id} className="activity-item">
                 <div className="activity-icon">
                   <span className="material-symbols-outlined" style={{ fontSize: '0.95rem' }}>
-                    {act.action === 'uploaded' ? 'upload_file' : act.action.includes('deleted') ? 'delete' : 'download'}
+                    {getActivityIcon(act.action)}
                   </span>
                 </div>
                 <div className="activity-content">
                   <p style={{ margin: 0 }}>
-                    <strong>{act.user}</strong> {act.action} <span style={{ color: 'var(--primary)', fontWeight: 500 }}>{act.target}</span>
+                    <strong>{act.user}</strong> {act.action}{' '}
+                    <span style={{ color: 'var(--primary)', fontWeight: 500 }}>{act.target}</span>
                   </p>
                   <div className="activity-time">{act.time}</div>
                 </div>
               </div>
             ))}
           </div>
-
           <button
             type="button"
-            onClick={() => toast.success('Displaying full audit trails...')}
-            style={{ width: '100%', marginTop: '24px', border: 'none', background: 'transparent', color: 'var(--primary)', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', textAlign: 'center' }}
+            className="elevate-audit-link"
+            onClick={() => toast.success('Opening full audit log...')}
           >
-            View Full History
+            View Full Audit Log
           </button>
-        </Card>
+        </motion.div>
 
-        <div className="document-footer-row">
-          <div className="promo-banner promo-banner-compact">
-            <h3>Secure E-Signatures</h3>
-            <p>Send handbooks and contracts for digital approval.</p>
-            <Button type="button" variant="outline" onClick={() => toast.success('Opening e-signature configuration...')} style={{ background: 'white', color: '#0f172a', alignSelf: 'flex-start', border: 'none', marginTop: '4px', padding: '6px 10px' }}>
-              Configure
-            </Button>
-          </div>
-
-          <div className="document-footer-card">
-            <strong>Files</strong>
-            <span>{documents.length} active</span>
-            <button type="button" onClick={handleExportFiles}>
-              Export
-            </button>
-          </div>
-        </div>
-      </div>
+        <motion.div
+          className="elevate-panel elevate-promo promo-banner"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <h3>Secure E-Signatures</h3>
+          <p>Send handbooks and contracts for digital approval with enterprise-grade security.</p>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => toast.success('Opening e-signature configuration...')}
+          >
+            Learn More
+          </Button>
+        </motion.div>
+      </aside>
     </div>
   );
 }

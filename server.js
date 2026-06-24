@@ -3,6 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import http from 'http';
+import https from 'https';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,6 +14,16 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Disable caching for HTML files during development
+app.use((req, res, next) => {
+  if (req.path.endsWith('.html')) {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+  next();
+});
 
 /**
  * Route: Login Page
@@ -76,6 +87,10 @@ app.get('/manager/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'manager', 'index.html'));
 });
 
+app.get('/manager/associates', (req, res) => {
+  res.sendFile(path.join(__dirname, 'manager', 'index.html'));
+});
+
 app.get(/^\/manager\/.*$/, (req, res) => {
   res.sendFile(path.join(__dirname, 'manager', 'index.html'));
 });
@@ -87,19 +102,19 @@ app.get(/^\/manager\/.*$/, (req, res) => {
 
 // HR API Endpoints
 app.use('/api/associates', (req, res, next) => {
-  // Forward to HR backend
-  forwardRequest(req, res, 'http://localhost:5000');
+  // Forward to HR backend (hr-service runs on port 5001)
+  forwardRequest(req, res, `http://localhost:5001`);
 });
 
 app.use('/api/hr', (req, res, next) => {
-  // Forward to HR backend
-  forwardRequest(req, res, 'http://localhost:5000');
+  // Forward to HR backend (hr-service runs on port 5001)
+  forwardRequest(req, res, `http://localhost:5001`);
 });
 
 // Manager API Endpoints
 app.use('/api/manager', (req, res, next) => {
-  // Forward to Manager backend
-  forwardRequest(req, res, 'http://localhost:5001');
+  // Forward to Manager backend (manager-service runs on port 5002)
+  forwardRequest(req, res, `http://localhost:5002`);
 });
 
 /**
@@ -128,7 +143,7 @@ app.use((req, res) => {
  * Helper: Forward requests to backend servers
  */
 function forwardRequest(req, res, backendUrl) {
-  const http_module = backendUrl.startsWith('https') ? require('https') : http;
+  const httpModule = backendUrl.startsWith('https') ? https : http;
   
   const options = {
     hostname: new URL(backendUrl).hostname,
@@ -138,13 +153,16 @@ function forwardRequest(req, res, backendUrl) {
     headers: req.headers,
   };
 
-  const proxyReq = http_module.request(options, (proxyRes) => {
-    res.writeHead(proxyRes.statusCode, proxyRes.headers);
+  const proxyReq = httpModule.request(options, (proxyRes) => {
+    // Remove content-encoding for streaming
+    const headers = { ...proxyRes.headers };
+    delete headers['content-encoding'];
+    res.writeHead(proxyRes.statusCode, headers);
     proxyRes.pipe(res);
   });
 
   proxyReq.on('error', (error) => {
-    console.error('Proxy error:', error);
+    console.error(`Proxy error for ${backendUrl}:`, error.message);
     res.status(503).json({ error: 'Backend service unavailable' });
   });
 

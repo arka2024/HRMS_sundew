@@ -1,9 +1,31 @@
 // State Management
 let associates = [];
+let filteredAssociates = [];
 let activeAssociateId = "sarah-chen";
 let currentUser = null;
 let activeTab = "dashboard";
 let notifications = [];
+
+// Pagination state
+let evalPage = 1;
+const EVAL_PAGE_SIZE = 10;
+let teamPage = 1;
+const TEAM_PAGE_SIZE = 6;
+
+function normalizeScore(value) {
+  const score = Number(value);
+  if (!Number.isFinite(score)) return 3;
+  return Math.min(5, Math.max(1, Math.round(score)));
+}
+
+function setScoreInput(inputId, valueId, value) {
+  const score = normalizeScore(value);
+  const input = document.getElementById(inputId);
+  const valueEl = document.getElementById(valueId);
+  if (input) input.value = score;
+  if (valueEl) valueEl.innerText = `${score}/5`;
+  return score;
+}
 
 // Initialize Page
 document.addEventListener("DOMContentLoaded", () => {
@@ -50,8 +72,8 @@ function checkAuth() {
   }
 }
 
-function loginAs(name, avatar) {
-  const user = { name, avatar };
+function loginAs(id, name, avatar, role) {
+  const user = { id, name, avatar, role };
   localStorage.getItem("hrms_manager");
   localStorage.setItem("hrms_manager", JSON.stringify(user));
   currentUser = user;
@@ -75,8 +97,9 @@ function getManagers() {
   let managers = localStorage.getItem("hrms_registered_managers");
   if (!managers) {
     managers = [
-      { name: "Sarah Thompson", email: "manager@sundew.com", password: "password123", role: "Lead HR Manager", avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuCCEBSgyvWhWcUFD0_sFk0Z5fn365kbumbRqrv0GfIZuJzhpIr_eUJNWeIBGOl3ilIv7K2R5i4SFlgLPUmMLkSojNB61S0Y-tspj1SNDCxbSMr327OASz9b24mdOjMqUvq2GKMtN4H5b8Se1gxiKRGOkQKZgNqW7QE59DYjL4guWRIGz4azjNWxeGTr8iJBEJBzwMmY-49ETYtOTynhsY_SqQ6vOxPyxzNOP3VZLhi8Skrjr1D3s7TyorKUMJf9YiCbHAmFsV07M9c" },
-      { name: "Marcus Vance", email: "marcus@sundew.com", password: "password123", role: "Reporting Manager (RM)", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200" }
+      { id: "manager-001", name: "Sarah Thompson", email: "manager@sundew.com", password: "password123", role: "Lead HR Manager", avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuCCEBSgyvWhWcUFD0_sFk0Z5fn365kbumbRqrv0GfIZuJzhpIr_eUJNWeIBGOl3ilIv7K2R5i4SFlgLPUmMLkSojNB61S0Y-tspj1SNDCxbSMr327OASz9b24mdOjMqUvq2GKMtN4H5b8Se1gxiKRGOkQKZgNqW7QE59DYjL4guWRIGz4azjNWxeGTr8iJBEJBzwMmY-49ETYtOTynhsY_SqQ6vOxPyxzNOP3VZLhi8Skrjr1D3s7TyorKUMJf9YiCbHAmFsV07M9c" },
+      { id: "manager-002", name: "Marcus Vance", email: "marcus@sundew.com", password: "password123", role: "Reporting Manager (RM)", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200" },
+      { id: "manager-003", name: "Elena Vance", email: "elena@sundew.com", password: "password123", role: "Reporting Manager (RM)", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200" }
     ];
     localStorage.setItem("hrms_registered_managers", JSON.stringify(managers));
   } else {
@@ -94,7 +117,7 @@ function handleLogin(e) {
   const user = managers.find(m => m.email === email && m.password === password);
   
   if (user) {
-    loginAs(user.name, user.avatar);
+    loginAs(user.id, user.name, user.avatar, user.role);
   } else {
     alert("Invalid credentials.");
   }
@@ -114,12 +137,13 @@ function handleRegister(e) {
   }
   
   const newUser = {
+    id: "manager-" + Date.now(),
     name, email, password, role, avatar: "https://ui-avatars.com/api/?name=" + encodeURIComponent(name) + "&background=random"
   };
   managers.push(newUser);
   localStorage.setItem("hrms_registered_managers", JSON.stringify(managers));
   
-  loginAs(newUser.name, newUser.avatar);
+  loginAs(newUser.id, newUser.name, newUser.avatar, newUser.role);
 }
 
 function toggleAuthMode(mode) {
@@ -145,25 +169,68 @@ function logout() {
   addNotification("Logged out successfully", "info");
 }
 
+// Get next unevaluated associate (synced from HR only)
+function getNextUnevaluatedAssociate() {
+  // Filter only synced-from-HR associates
+  const syncedAssociates = associates.filter(a => a.syncedFromHr);
+  
+  // Find first associate without evaluation history
+  const nextUnevaluated = syncedAssociates.find(a => !a.history || a.history.length === 0);
+  if (nextUnevaluated) return nextUnevaluated.id;
+  
+  // Fallback: find first synced associate
+  return syncedAssociates.length > 0 ? syncedAssociates[0].id : null;
+}
+
+// Filter associates based on logged-in manager ID
+function filterAssociatesByManager() {
+  if (!currentUser || !currentUser.id) {
+    filteredAssociates = associates;
+    return;
+  }
+  
+  // Filter associates where managerId matches current user's ID
+  filteredAssociates = associates.filter(a => a.managerId === currentUser.id);
+  
+  // If no associates found for this manager, show empty state
+  if (filteredAssociates.length === 0) {
+    console.log(`No associates found for manager ${currentUser.name} (${currentUser.id})`);
+  }
+}
+
 // Fetch associates from backend
 async function fetchAssociates() {
   try {
-    const response = await fetch('/api/associates');
+    // Fetch from HR backend API (port 5001)
+    const response = await fetch('http://localhost:5001/api/associates');
     if (!response.ok) throw new Error("Failed to fetch associates");
     associates = await response.ok ? await response.json() : [];
+    
+    // Apply access control filter
+    filterAssociatesByManager();
     
     renderAssociateList();
     renderTeamGrid();
     renderEvaluationLog();
     renderReports();
     
-    // Select default active associate
-    if (associates.length > 0) {
-      // Find active index, fallback if deleted
-      const exists = associates.some(a => a.id === activeAssociateId);
-      if (!exists) {
-        activeAssociateId = associates[0].id;
+    // Select default active associate: prefer next unevaluated from synced
+    const syncedAssociates = filteredAssociates.filter(a => a.syncedFromHr);
+    if (syncedAssociates.length > 0) {
+      const nextId = getNextUnevaluatedAssociate();
+      if (nextId) {
+        activeAssociateId = nextId;
+      } else {
+        activeAssociateId = syncedAssociates[0].id;
       }
+    } else if (filteredAssociates.length > 0) {
+      const exists = filteredAssociates.some(a => a.id === activeAssociateId);
+      if (!exists) {
+        activeAssociateId = filteredAssociates[0].id;
+      }
+    }
+    
+    if (activeAssociateId) {
       selectAssociate(activeAssociateId);
     }
   } catch (error) {
@@ -172,21 +239,50 @@ async function fetchAssociates() {
   }
 }
 
-// Render left sidebar list
+// Render left sidebar list - show only synced associates from HR
 function renderAssociateList() {
   const container = document.getElementById("associate-list");
   if (!container) return;
   
-  let managerListHtml = "";
-  associates.forEach(associate => {
+  // Filter only synced associates from HR (already filtered by manager)
+  const syncedAssociates = filteredAssociates.filter(a => a.syncedFromHr);
+  const legacyAssociates = filteredAssociates.filter(a => !a.syncedFromHr);
+  
+  let syncedListHtml = "";
+  syncedAssociates.forEach(associate => {
     const isActive = associate.id === activeAssociateId;
     const activeClass = isActive 
       ? "bg-secondary text-white font-semibold" 
       : "text-on-surface-variant hover:bg-surface-container-high";
     
     const statusDotColor = associate.status === "On Track" ? "bg-[#15803d]" : "bg-error";
+    const hasEvaluation = associate.history && associate.history.length > 0;
+    const evaluationIcon = hasEvaluation ? '<span class="material-symbols-outlined text-[12px]">check_circle</span>' : '';
     
-    managerListHtml += `
+    syncedListHtml += `
+      <button onclick="selectAssociate('${associate.id}')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-sm transition-all focus:outline-none mb-1 ${activeClass}">
+        <div class="flex items-center gap-3">
+          <img class="w-8 h-8 rounded-full object-cover border border-outline-variant/30" src="${associate.avatar}" alt="${associate.name}">
+          <span class="truncate">${associate.name}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          ${evaluationIcon}
+          <span class="w-2.5 h-2.5 rounded-full ${statusDotColor} border border-white/20"></span>
+        </div>
+      </button>
+    `;
+  });
+  
+  let legacyListHtml = "";
+  legacyAssociates.forEach(associate => {
+    const isActive = associate.id === activeAssociateId;
+    const activeClass = isActive 
+      ? "bg-secondary text-white font-semibold" 
+      : "text-on-surface-variant hover:bg-surface-container-high opacity-50";
+    
+    const statusDotColor = associate.status === "On Track" ? "bg-[#15803d]" : "bg-error";
+    
+    legacyListHtml += `
       <button onclick="selectAssociate('${associate.id}')" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-sm transition-all focus:outline-none mb-1 ${activeClass}">
         <div class="flex items-center gap-3">
           <img class="w-8 h-8 rounded-full object-cover border border-outline-variant/30" src="${associate.avatar}" alt="${associate.name}">
@@ -201,30 +297,25 @@ function renderAssociateList() {
 
   container.innerHTML = `
     <div class="mb-2">
-      <div class="text-xs font-bold text-on-surface-variant uppercase tracking-wider px-3 mb-2 flex justify-between items-center cursor-pointer" onclick="document.getElementById('manager-section').classList.toggle('hidden')">
-        <span>Manager</span>
+      <div class="text-xs font-bold text-on-surface-variant uppercase tracking-wider px-3 mb-2 flex justify-between items-center cursor-pointer" onclick="document.getElementById('associates-section').classList.toggle('hidden')">
+        <span>Associates <span class="text-[10px] font-normal">(${syncedAssociates.length})</span></span>
         <span class="material-symbols-outlined text-[16px]">expand_more</span>
       </div>
-      <div id="manager-section" class="space-y-1">
-        ${managerListHtml}
+      <div id="associates-section" class="space-y-1">
+        ${syncedListHtml || '<p class="px-3 text-xs text-on-surface-variant italic">No synced associates yet.</p>'}
       </div>
     </div>
+    ${legacyAssociates.length > 0 ? `
     <div class="mb-2">
-      <div class="text-xs font-bold text-on-surface-variant uppercase tracking-wider px-3 mb-2 flex justify-between items-center cursor-pointer opacity-50" onclick="document.getElementById('hr-section').classList.toggle('hidden')">
-        <span>HR</span>
+      <div class="text-xs font-bold text-on-surface-variant uppercase tracking-wider px-3 mb-2 flex justify-between items-center cursor-pointer opacity-50" onclick="document.getElementById('legacy-section').classList.toggle('hidden')">
+        <span>Previous</span>
         <span class="material-symbols-outlined text-[16px]">chevron_right</span>
       </div>
-      <div id="hr-section" class="hidden space-y-1">
+      <div id="legacy-section" class="hidden space-y-1">
+        ${legacyListHtml}
       </div>
     </div>
-    <div class="mb-2">
-      <div class="text-xs font-bold text-on-surface-variant uppercase tracking-wider px-3 mb-2 flex justify-between items-center cursor-pointer opacity-50" onclick="document.getElementById('associates-section').classList.toggle('hidden')">
-        <span>Associates</span>
-        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-      </div>
-      <div id="associates-section" class="hidden space-y-1">
-      </div>
-    </div>
+    ` : ''}
   `;
 }
 
@@ -235,7 +326,7 @@ async function selectAssociate(id) {
   
   // Fetch detailed data
   try {
-    const response = await fetch(`/api/associates/${id}`);
+    const response = await fetch(`http://localhost:5001/api/associates/${id}`);
     if (!response.ok) throw new Error("Failed to fetch associate details");
     const associate = await response.json();
     
@@ -281,17 +372,10 @@ async function selectAssociate(id) {
     
     // Update Evaluation Sliders
     const evalData = associate.currentEvaluation;
-    document.getElementById("input-tech").value = evalData.tech;
-    document.getElementById("val-tech").innerText = `${evalData.tech}/5`;
-    
-    document.getElementById("input-learn").value = evalData.learn;
-    document.getElementById("val-learn").innerText = `${evalData.learn}/5`;
-    
-    document.getElementById("input-adapt").value = evalData.adapt;
-    document.getElementById("val-adapt").innerText = `${evalData.adapt}/5`;
-    
-    document.getElementById("input-att").value = evalData.attitude;
-    document.getElementById("val-att").innerText = `${evalData.attitude}/5`;
+    setScoreInput("input-tech", "val-tech", evalData.tech);
+    setScoreInput("input-learn", "val-learn", evalData.learn);
+    setScoreInput("input-adapt", "val-adapt", evalData.adapt);
+    setScoreInput("input-att", "val-att", evalData.attitude);
     
     document.getElementById("eval-comments").value = evalData.comments;
     
@@ -311,10 +395,10 @@ async function selectAssociate(id) {
 
 // Live feedback of average score on slider move
 function updateLiveScores() {
-  const tech = parseFloat(document.getElementById("input-tech").value);
-  const learn = parseFloat(document.getElementById("input-learn").value);
-  const adapt = parseFloat(document.getElementById("input-adapt").value);
-  const attitude = parseFloat(document.getElementById("input-att").value);
+  const tech = setScoreInput("input-tech", "val-tech", document.getElementById("input-tech").value);
+  const learn = setScoreInput("input-learn", "val-learn", document.getElementById("input-learn").value);
+  const adapt = setScoreInput("input-adapt", "val-adapt", document.getElementById("input-adapt").value);
+  const attitude = setScoreInput("input-att", "val-att", document.getElementById("input-att").value);
   
   const avg = (tech + learn + adapt + attitude) / 4;
   document.getElementById("live-average-score").innerText = avg.toFixed(1);
@@ -430,10 +514,10 @@ function renderPerformanceCurves(associate) {
   
   // Add current evaluation as the latest month
   const currentMonthName = associate.history.length === 0 ? "Month 1" : `Month ${associate.history.length + 1}`;
-  const curTech = associate.currentEvaluation.tech;
-  const curLearn = associate.currentEvaluation.learn;
-  const curAdapt = associate.currentEvaluation.adapt;
-  const curAttitude = associate.currentEvaluation.attitude;
+  const curTech = normalizeScore(associate.currentEvaluation.tech);
+  const curLearn = normalizeScore(associate.currentEvaluation.learn);
+  const curAdapt = normalizeScore(associate.currentEvaluation.adapt);
+  const curAttitude = normalizeScore(associate.currentEvaluation.attitude);
   const curAvg = calculateEvaluationAverage(associate.currentEvaluation);
   
   points.push({
@@ -459,10 +543,10 @@ function renderPerformanceCurves(associate) {
 }
 
 function calculateEvaluationAverage(evaluation) {
-  const tech = parseFloat(evaluation.tech) || 0;
-  const learn = parseFloat(evaluation.learn) || 0;
-  const adapt = parseFloat(evaluation.adapt) || 0;
-  const attitude = parseFloat(evaluation.attitude) || 0;
+  const tech = normalizeScore(evaluation.tech);
+  const learn = normalizeScore(evaluation.learn);
+  const adapt = normalizeScore(evaluation.adapt);
+  const attitude = normalizeScore(evaluation.attitude);
   return (tech + learn + adapt + attitude) / 4;
 }
 
@@ -678,14 +762,14 @@ function renderAiSuggestions(tech, learn, adapt, attitude) {
 async function handleSaveEvaluation(e) {
   e.preventDefault();
   
-  const tech = document.getElementById("input-tech").value;
-  const learn = document.getElementById("input-learn").value;
-  const adapt = document.getElementById("input-adapt").value;
-  const attitude = document.getElementById("input-att").value;
+  const tech = normalizeScore(document.getElementById("input-tech").value);
+  const learn = normalizeScore(document.getElementById("input-learn").value);
+  const adapt = normalizeScore(document.getElementById("input-adapt").value);
+  const attitude = normalizeScore(document.getElementById("input-att").value);
   const comments = document.getElementById("eval-comments").value;
   
   try {
-    const response = await fetch(`/api/associates/${activeAssociateId}/evaluations`, {
+    const response = await fetch(`http://localhost:5001/api/associates/${activeAssociateId}/evaluations`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tech, learn, adapt, attitude, comments })
@@ -708,15 +792,21 @@ async function handleSaveEvaluation(e) {
   }
 }
 
-// Render team tab cards
+// Render team tab cards with pagination
 function renderTeamGrid() {
   const container = document.getElementById("team-grid");
   if (!container) return;
   container.innerHTML = "";
   
-  document.getElementById("team-count").innerText = `${associates.length} Associate${associates.length !== 1 ? 's' : ''}`;
+  document.getElementById("team-count").innerText = `${filteredAssociates.length} Associate${filteredAssociates.length !== 1 ? 's' : ''}`;
   
-  associates.forEach(associate => {
+  // Apply pagination
+  const totalPages = Math.max(1, Math.ceil(filteredAssociates.length / TEAM_PAGE_SIZE));
+  teamPage = Math.min(teamPage, totalPages);
+  const start = (teamPage - 1) * TEAM_PAGE_SIZE;
+  const pagedAssociates = filteredAssociates.slice(start, start + TEAM_PAGE_SIZE);
+  
+  pagedAssociates.forEach(associate => {
     const curAvg = calculateEvaluationAverage(associate.currentEvaluation);
     const historyAvg = associate.history.length > 0
       ? associate.history.reduce((sum, h) => sum + h.average, 0) / associate.history.length
@@ -771,6 +861,30 @@ function renderTeamGrid() {
       </div>
     `;
   });
+  
+  // Add pagination controls if needed
+  if (totalPages > 1) {
+    container.innerHTML += `
+      <div class="col-span-1 md:col-span-2 lg:col-span-3 flex items-center justify-center gap-3 pt-4">
+        <button onclick="teamPrevPage()" class="px-4 py-2 text-xs font-semibold border border-outline-variant rounded-lg hover:bg-surface-container transition-all flex items-center gap-1" ${teamPage <= 1 ? 'disabled style="opacity:0.4"' : ''}>
+          <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+          Previous
+        </button>
+        <span class="text-xs font-bold text-primary px-3">Page ${teamPage} of ${totalPages}</span>
+        <button onclick="teamNextPage()" class="px-4 py-2 text-xs font-semibold border border-outline-variant rounded-lg hover:bg-surface-container transition-all flex items-center gap-1" ${teamPage >= totalPages ? 'disabled style="opacity:0.4"' : ''}>
+          Next
+          <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+        </button>
+      </div>
+    `;
+  }
+}
+
+function teamPrevPage() { teamPage = Math.max(1, teamPage - 1); renderTeamGrid(); }
+function teamNextPage() {
+  const totalPages = Math.max(1, Math.ceil(filteredAssociates.length / TEAM_PAGE_SIZE));
+  teamPage = Math.min(totalPages, teamPage + 1);
+  renderTeamGrid();
 }
 
 function reviewFromTeamGrid(id) {
@@ -783,7 +897,7 @@ async function deleteAssociate(id) {
   if (!confirm("Are you sure you want to delete this associate record? This cannot be undone.")) return;
   
   try {
-    const response = await fetch(`/api/associates/${id}`, { method: 'DELETE' });
+    const response = await fetch(`http://localhost:5001/api/associates/${id}`, { method: 'DELETE' });
     if (!response.ok) throw new Error("Delete failed");
     
     addNotification("Associate record removed", "info");
@@ -794,65 +908,111 @@ async function deleteAssociate(id) {
   }
 }
 
-// Render evaluations logs table
+// Render evaluations logs table with pagination
 function renderEvaluationLog() {
   const tbody = document.getElementById("eval-log-table-body");
   if (!tbody) return;
   tbody.innerHTML = "";
   
-  let count = 0;
-  associates.forEach(associate => {
+  // Collect all evaluation records
+  let allRecords = [];
+  filteredAssociates.forEach(associate => {
     // Current
     const curAvg = (associate.currentEvaluation.tech + associate.currentEvaluation.learn + associate.currentEvaluation.adapt + associate.currentEvaluation.attitude) / 4;
-    tbody.innerHTML += `
-      <tr class="hover:bg-surface-container/30 transition-colors text-xs text-on-surface border-b border-outline-variant/50">
-        <td class="p-4 flex items-center gap-2">
-          <img class="w-6 h-6 rounded-full object-cover" src="${associate.avatar}">
-          <span class="font-bold">${associate.name}</span>
-        </td>
-        <td class="p-4 font-semibold">Current Month</td>
-        <td class="p-4">${associate.currentEvaluation.tech}/5</td>
-        <td class="p-4">${associate.currentEvaluation.learn}/5</td>
-        <td class="p-4">${associate.currentEvaluation.adapt}/5</td>
-        <td class="p-4">${associate.currentEvaluation.attitude}/5</td>
-        <td class="p-4 font-bold text-secondary">${curAvg.toFixed(2)}</td>
-        <td class="p-4 max-w-xs truncate italic text-on-surface-variant" title="${associate.currentEvaluation.comments || 'No comment'}">
-          ${associate.currentEvaluation.comments || '-'}
-        </td>
-      </tr>
-    `;
-    count++;
+    allRecords.push({
+      type: 'current',
+      associate: associate,
+      month: 'Current Month',
+      tech: associate.currentEvaluation.tech,
+      learn: associate.currentEvaluation.learn,
+      adapt: associate.currentEvaluation.adapt,
+      attitude: associate.currentEvaluation.attitude,
+      avg: curAvg,
+      comments: associate.currentEvaluation.comments
+    });
     
     // History
     associate.history.forEach(hist => {
-      tbody.innerHTML += `
-        <tr class="hover:bg-surface-container/30 transition-colors text-xs text-on-surface border-b border-outline-variant/50">
-          <td class="p-4 flex items-center gap-2">
-            <img class="w-6 h-6 rounded-full object-cover opacity-60" src="${associate.avatar}">
-            <span class="text-on-surface-variant">${associate.name}</span>
-          </td>
-          <td class="p-4 text-on-surface-variant">${hist.month}</td>
-          <td class="p-4 text-on-surface-variant">${hist.tech}/5</td>
-          <td class="p-4 text-on-surface-variant">${hist.learn}/5</td>
-          <td class="p-4 text-on-surface-variant">${hist.adapt}/5</td>
-          <td class="p-4 text-on-surface-variant">${hist.attitude}/5</td>
-          <td class="p-4 font-bold text-on-surface-variant">${hist.average.toFixed(2)}</td>
-          <td class="p-4 max-w-xs truncate italic text-on-surface-variant" title="${hist.comments || 'No comment'}">
-            ${hist.comments || '-'}
-          </td>
-        </tr>
-      `;
-      count++;
+      allRecords.push({
+        type: 'history',
+        associate: associate,
+        month: hist.month,
+        tech: hist.tech,
+        learn: hist.learn,
+        adapt: hist.adapt,
+        attitude: hist.attitude,
+        avg: hist.average,
+        comments: hist.comments
+      });
     });
   });
   
-  if (count === 0) {
+  // Apply pagination
+  const totalPages = Math.max(1, Math.ceil(allRecords.length / EVAL_PAGE_SIZE));
+  evalPage = Math.min(evalPage, totalPages);
+  const start = (evalPage - 1) * EVAL_PAGE_SIZE;
+  const pagedRecords = allRecords.slice(start, start + EVAL_PAGE_SIZE);
+  
+  // Render paginated records
+  pagedRecords.forEach(record => {
+    const isCurrent = record.type === 'current';
+    tbody.innerHTML += `
+      <tr class="hover:bg-surface-container/30 transition-colors text-xs text-on-surface border-b border-outline-variant/50">
+        <td class="p-4 flex items-center gap-2">
+          <img class="w-6 h-6 rounded-full object-cover ${isCurrent ? '' : 'opacity-60'}" src="${record.associate.avatar}">
+          <span class="font-bold ${isCurrent ? '' : 'text-on-surface-variant'}">${record.associate.name}</span>
+        </td>
+        <td class="p-4 font-semibold ${isCurrent ? '' : 'text-on-surface-variant'}">${record.month}</td>
+        <td class="p-4 ${isCurrent ? '' : 'text-on-surface-variant'}">${record.tech}/5</td>
+        <td class="p-4 ${isCurrent ? '' : 'text-on-surface-variant'}">${record.learn}/5</td>
+        <td class="p-4 ${isCurrent ? '' : 'text-on-surface-variant'}">${record.adapt}/5</td>
+        <td class="p-4 ${isCurrent ? '' : 'text-on-surface-variant'}">${record.attitude}/5</td>
+        <td class="p-4 font-bold ${isCurrent ? 'text-secondary' : 'text-on-surface-variant'}">${record.avg.toFixed(2)}</td>
+        <td class="p-4 max-w-xs truncate italic text-on-surface-variant" title="${record.comments || 'No comment'}">
+          ${record.comments || '-'}
+        </td>
+      </tr>
+    `;
+  });
+  
+  if (allRecords.length === 0) {
     tbody.innerHTML = `
       <tr>
         <td colspan="8" class="p-8 text-center text-on-surface-variant italic">No evaluation records log found.</td>
       </tr>
     `;
   }
+  
+  // Render pagination controls
+  const pagination = document.getElementById("eval-pagination");
+  if (pagination) {
+    pagination.innerHTML = `
+      <span class="text-sm text-on-surface-variant">Showing ${pagedRecords.length} of ${allRecords.length} records</span>
+      <div class="flex gap-2 items-center">
+        <button onclick="evalPrevPage()" class="px-4 py-2 text-xs font-semibold border border-outline-variant rounded-lg hover:bg-surface-container transition-all flex items-center gap-1" ${evalPage <= 1 ? 'disabled style="opacity:0.4"' : ''}>
+          <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+          Previous
+        </button>
+        <span class="text-xs font-bold text-primary px-3">Page ${evalPage} of ${totalPages}</span>
+        <button onclick="evalNextPage()" class="px-4 py-2 text-xs font-semibold border border-outline-variant rounded-lg hover:bg-surface-container transition-all flex items-center gap-1" ${evalPage >= totalPages ? 'disabled style="opacity:0.4"' : ''}>
+          Next
+          <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+        </button>
+      </div>
+    `;
+  }
+}
+
+function evalPrevPage() { evalPage = Math.max(1, evalPage - 1); renderEvaluationLog(); }
+function evalNextPage() {
+  const allRecords = [];
+  filteredAssociates.forEach(associate => {
+    allRecords.push({ type: 'current' });
+    associate.history.forEach(() => allRecords.push({ type: 'history' }));
+  });
+  const totalPages = Math.max(1, Math.ceil(allRecords.length / EVAL_PAGE_SIZE));
+  evalPage = Math.min(totalPages, evalPage + 1);
+  renderEvaluationLog();
 }
 
 // Search filter for evaluations
@@ -873,9 +1033,9 @@ function filterEvaluationLog() {
 // Render charts in Reports tab
 function renderReports() {
   // 1. Status Donut chart ratios
-  const onTrackCount = associates.filter(a => a.status === "On Track").length;
-  const needsImprovementCount = associates.filter(a => a.status === "Needs Improvement").length;
-  const total = associates.length;
+  const onTrackCount = filteredAssociates.filter(a => a.status === "On Track").length;
+  const needsImprovementCount = filteredAssociates.filter(a => a.status === "Needs Improvement").length;
+  const total = filteredAssociates.length;
   
   document.getElementById("report-total-employees").innerText = total;
   document.getElementById("donut-val-track").innerText = onTrackCount;
@@ -902,7 +1062,7 @@ function renderReports() {
   
   // Compute group scores
   const managerMap = {};
-  associates.forEach(a => {
+  filteredAssociates.forEach(a => {
     const currentAvg = (a.currentEvaluation.tech + a.currentEvaluation.learn + a.currentEvaluation.adapt + a.currentEvaluation.attitude) / 4;
     if (!managerMap[a.manager]) {
       managerMap[a.manager] = [];
@@ -948,13 +1108,21 @@ async function resetDatabase() {
   }
 }
 
-// Tab Switching System
+// ── Processed Associates State ──
+let processedData = [];
+let processedSortField = 'employeeId';
+let processedSortDir = 'asc';
+let processedPage = 1;
+const PROCESSED_PAGE_SIZE = 10;
+
+// ── Tab Switching System ──
 function switchTab(tabName) {
   activeTab = tabName;
   
   // Hide all panels
   document.getElementById("tab-content-dashboard").classList.add("hidden");
   document.getElementById("tab-content-team").classList.add("hidden");
+  document.getElementById("tab-content-associates").classList.add("hidden");
   document.getElementById("tab-content-evaluations").classList.add("hidden");
   document.getElementById("tab-content-reports").classList.add("hidden");
   document.getElementById("tab-content-help").classList.add("hidden");
@@ -973,21 +1141,130 @@ function switchTab(tabName) {
   
   // Style top nav links
   document.querySelectorAll(".nav-tab").forEach(tab => {
-    tab.className = "nav-tab text-on-surface-variant hover:text-secondary transition-colors duration-150 text-sm pb-1 focus:outline-none";
+    tab.className = "nav-tab text-on-surface-variant hover:text-secondary transition-colors duration-150 text-sm pb-1 focus:outline-none px-2 py-1 rounded-lg hover:bg-surface-container-low";
   });
   
   const activeNav = document.getElementById(`nav-${tabName}`);
   if (activeNav) {
-    activeNav.className = "nav-tab text-secondary border-b-2 border-secondary font-bold pb-1 text-sm transition-all focus:outline-none";
+    activeNav.className = "nav-tab text-secondary bg-secondary/10 font-bold pb-1 text-sm transition-all focus:outline-none px-3 py-1 rounded-lg";
   }
   
   // Trigger specific re-renders
   if (tabName === "team") renderTeamGrid();
   if (tabName === "evaluations") renderEvaluationLog();
   if (tabName === "reports") renderReports();
+  if (tabName === "associates") loadProcessedAssociates();
   
   // Close sidebar overlay on mobile on tap
   toggleSidebar(true);
+}
+
+// ── Processed Associates from HR Uploads ──
+async function loadProcessedAssociates() {
+  try {
+    const response = await fetch('http://localhost:5001/api/associates');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    processedData = data.associates || data || [];
+    renderProcessedTable();
+  } catch (err) {
+    console.error('Failed to load processed associates:', err);
+    document.getElementById('processed-tbody').innerHTML =
+      '<tr><td colspan="7" class="p-8 text-center text-on-surface-variant italic">Failed to load. Is the hr-service backend running on port 5001?</td></tr>';
+  }
+}
+
+function sortProcessed(field) {
+  if (processedSortField === field) {
+    processedSortDir = processedSortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    processedSortField = field;
+    processedSortDir = 'asc';
+  }
+  document.querySelectorAll('#processed-tbody th span[id^="psort-"]').forEach(s => s.textContent = '');
+  const sortIcon = document.getElementById('psort-' + field);
+  if (sortIcon) sortIcon.textContent = processedSortDir === 'asc' ? '▲' : '▼';
+  renderProcessedTable();
+}
+
+function renderProcessedTable() {
+  const sorted = [...processedData].sort((a, b) => {
+    let va = a[processedSortField], vb = b[processedSortField];
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    if (va < vb) return processedSortDir === 'asc' ? -1 : 1;
+    if (va > vb) return processedSortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PROCESSED_PAGE_SIZE));
+  processedPage = Math.min(processedPage, totalPages);
+  const start = (processedPage - 1) * PROCESSED_PAGE_SIZE;
+  const paged = sorted.slice(start, start + PROCESSED_PAGE_SIZE);
+
+  const tbody = document.getElementById('processed-tbody');
+  if (paged.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-on-surface-variant italic">No processed associates found. HR needs to upload data first.</td></tr>';
+  } else {
+    tbody.innerHTML = paged.map(a => {
+      const progress = a.probationProgress || 0;
+      let barClass = 'bg-secondary';
+      if (progress >= 80) barClass = 'bg-[#15803d]';
+      else if (progress >= 50) barClass = 'bg-[#d97706]';
+      else barClass = 'bg-[#dc2626]';
+      return `<tr class="hover:bg-surface-container/30 transition-colors text-sm text-on-surface">
+        <td class="p-4 font-bold">${a.employeeId}</td>
+        <td class="p-4">${a.name}</td>
+        <td class="p-4 text-on-surface-variant">${a.dateOfJoining || '-'}</td>
+        <td class="p-4">${a.probationDurationMonths != null ? a.probationDurationMonths + ' mo' : '-'}</td>
+        <td class="p-4 text-on-surface-variant">${a.probationEndDate || '-'}</td>
+        <td class="p-4">
+          <div style="display:flex;align-items:center;gap:8px;min-width:130px">
+            <div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden" style="max-width:100px">
+              <div class="h-2 rounded-full ${barClass}" style="width:${Math.min(100, progress)}%"></div>
+            </div>
+            <strong class="text-xs">${Math.round(progress)}%</strong>
+          </div>
+        </td>
+        <td class="p-4 font-bold text-center">${a.taskCount ?? 0}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Summary stats
+  const summary = document.getElementById('processed-summary');
+  if (summary) {
+    const total = processedData.length;
+    const onTrack = processedData.filter(a => (a.probationProgress || 0) >= 75).length;
+    const inProgress = processedData.filter(a => (a.probationProgress || 0) >= 25 && (a.probationProgress || 0) < 75).length;
+    const notStarted = processedData.filter(a => !a.probationProgress || a.probationProgress === 0).length;
+    summary.innerHTML = `
+      <div class="bg-surface-container-low rounded-xl p-4 text-center"><strong class="text-xl block text-primary">${total}</strong><span class="text-xs text-on-surface-variant uppercase font-bold">Total</span></div>
+      <div class="bg-surface-container-low rounded-xl p-4 text-center"><strong class="text-xl block text-[#15803d]">${onTrack}</strong><span class="text-xs text-on-surface-variant uppercase font-bold">On Track</span></div>
+      <div class="bg-surface-container-low rounded-xl p-4 text-center"><strong class="text-xl block text-[#d97706]">${inProgress}</strong><span class="text-xs text-on-surface-variant uppercase font-bold">In Progress</span></div>
+      <div class="bg-surface-container-low rounded-xl p-4 text-center"><strong class="text-xl block text-on-surface-variant">${notStarted}</strong><span class="text-xs text-on-surface-variant uppercase font-bold">Not Started</span></div>
+    `;
+  }
+
+  // Pagination
+  const pagination = document.getElementById('processed-pagination');
+  if (pagination) {
+    pagination.innerHTML = `
+      <span class="text-sm text-on-surface-variant">Showing ${paged.length} of ${sorted.length} associates</span>
+      <div class="flex gap-2 items-center">
+        <button onclick="processedPrevPage()" class="px-3 py-1.5 text-xs font-semibold border border-outline-variant rounded-lg hover:bg-surface-container transition-all" ${processedPage <= 1 ? 'disabled style="opacity:0.4"' : ''}>Previous</button>
+        <span class="text-xs font-bold text-primary">Page ${processedPage} of ${totalPages}</span>
+        <button onclick="processedNextPage()" class="px-3 py-1.5 text-xs font-semibold border border-outline-variant rounded-lg hover:bg-surface-container transition-all" ${processedPage >= totalPages ? 'disabled style="opacity:0.4"' : ''}>Next</button>
+      </div>
+    `;
+  }
+}
+
+function processedPrevPage() { processedPage = Math.max(1, processedPage - 1); renderProcessedTable(); }
+function processedNextPage() {
+  const totalPages = Math.max(1, Math.ceil(processedData.length / PROCESSED_PAGE_SIZE));
+  processedPage = Math.min(totalPages, processedPage + 1);
+  renderProcessedTable();
 }
 
 // Sidebar Drawer toggling
@@ -1033,10 +1310,19 @@ function filterFaqs() {
   });
 }
 
-// Modal management
+// Modal management - Navigate to next unevaluated associate for evaluation
 function openNewAssociateModal() {
-  document.getElementById("new-associate-modal").classList.remove("hidden");
-  document.getElementById("new-name").focus();
+  const nextId = getNextUnevaluatedAssociate();
+  
+  if (!nextId) {
+    addNotification("All synced associates have been evaluated. Great work!", "success");
+    return;
+  }
+  
+  activeAssociateId = nextId;
+  selectAssociate(nextId);
+  switchTab('dashboard');
+  addNotification("Ready to evaluate next associate. Let's go!", "info");
 }
 
 function closeNewAssociateModal() {
