@@ -155,8 +155,14 @@ export async function saveOrUpdateEvaluation(data) {
   }
 }
 
-export async function lockEvaluation(employeeId, evaluationYear, evaluationMonth, lockedBy) {
+export async function lockEvaluation(employeeId, evaluationYear, evaluationMonth, lockedBy, reason = null) {
   const monthOptions = getMonthOptions(evaluationMonth);
+  const historyEntry = {
+    action: 'lock',
+    doneBy: lockedBy,
+    date: new Date(),
+    reason,
+  };
   return Evaluation.findOneAndUpdate(
     { 
       $or: [
@@ -169,14 +175,21 @@ export async function lockEvaluation(employeeId, evaluationYear, evaluationMonth
         evaluationStatus: 'Locked',
         lockedBy,
         lockedDate: new Date()
-      }
+      },
+      $push: { lockUnlockHistory: historyEntry }
     },
     { new: true, runValidators: true }
   ).exec();
 }
 
-export async function unlockEvaluation(employeeId, evaluationYear, evaluationMonth) {
+export async function unlockEvaluation(employeeId, evaluationYear, evaluationMonth, unlockedBy, reason = null) {
   const monthOptions = getMonthOptions(evaluationMonth);
+  const historyEntry = {
+    action: 'unlock',
+    doneBy: unlockedBy,
+    date: new Date(),
+    reason,
+  };
   return Evaluation.findOneAndUpdate(
     { 
       $or: [
@@ -189,7 +202,8 @@ export async function unlockEvaluation(employeeId, evaluationYear, evaluationMon
         evaluationStatus: 'Completed',
         lockedBy: null,
         lockedDate: null
-      }
+      },
+      $push: { lockUnlockHistory: historyEntry }
     },
     { new: true, runValidators: true }
   ).exec();

@@ -9,7 +9,9 @@ import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { PageHeader } from '../../components/PageHeader';
 import { ServiceError } from '../../components/ServiceError';
 import { useAuth } from '../../contexts/AuthContext';
-import { evaluationReportService, type EvaluationReport, type EvaluationDashboardStats } from '../../services/evaluation-report.service';
+import { evaluationReportService } from '../../services/evaluation-report.service';
+import type { EvaluationReport } from '../../types';
+import type { EvaluationDashboardStats } from '../../services/evaluation-report.service';
 
 export function ManagerEvaluationReportsPage() {
   const { token } = useAuth();
@@ -142,7 +144,7 @@ export function ManagerEvaluationReportsPage() {
             <span className="material-symbols-outlined">lock</span>
           </div>
           <div className="stat-content">
-            <div className="stat-value">{stats?.lockedEvaluationCycles || 0}</div>
+            <div className="stat-value">{stats?.lockedEvaluations || 0}</div>
             <div className="stat-label">Locked Cycles</div>
           </div>
         </motion.div>

@@ -10,7 +10,7 @@ import {
   getEvaluationReportSummary,
   seedEvaluations
 } from '../repositories/evaluation.repository.js';
-import { findAllEmployees } from '../repositories/employee.repository.js';
+import { findAllEmployees, findDistinctDepartments } from '../repositories/employee.repository.js';
 import xlsx from 'xlsx';
 import PDFDocument from 'pdfkit';
 
@@ -275,6 +275,16 @@ export async function seedEvaluationsController(req, res) {
   } catch (error) {
     console.error('Seed evaluations error:', error);
     res.status(500).json({ error: 'Failed to seed evaluations' });
+  }
+}
+
+export async function getDistinctDepartmentsController(req, res) {
+  try {
+    const departments = await findDistinctDepartments();
+    res.json({ departments });
+  } catch (error) {
+    console.error('Get distinct departments error:', error);
+    res.status(500).json({ error: 'Failed to get departments' });
   }
 }
 

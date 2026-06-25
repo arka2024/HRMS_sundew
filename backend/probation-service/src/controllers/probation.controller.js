@@ -1,7 +1,7 @@
 import { parseExcelAndUpsertEmployees, previewExcelEmployees } from '../services/probation.service.js';
 import { findManagerById, findAnyManager } from '../repositories/manager.repository.js';
 import { addUploadHistory, getUploadHistoryByManager } from '../repositories/uploadHistory.repository.js';
-import { findAllEmployees } from '../repositories/employee.repository.js';
+import { findAllEmployees, findEmployeeByNumber, createEmployee, updateEmployee, deleteEmployee } from '../repositories/employee.repository.js';
 
 async function resolveUploadManager(user) {
   if (user?.managerId) {
@@ -91,5 +91,45 @@ export async function getUploadHistoryController(req, res) {
   } catch (error) {
     console.error('Load upload history error:', error);
     return res.status(500).json({ error: 'Failed to load upload history' });
+  }
+}
+
+export async function createEmployeeController(req, res) {
+  try {
+    const employee = await createEmployee(req.body);
+    return res.json({ employee, message: 'Employee created successfully' });
+  } catch (error) {
+    console.error('Create employee error:', error);
+    const message = error instanceof Error ? error.message : 'Failed to create employee';
+    return res.status(500).json({ error: message });
+  }
+}
+
+export async function updateEmployeeController(req, res) {
+  try {
+    const { employeeNumber } = req.params;
+    const employee = await updateEmployee(employeeNumber, req.body);
+    if (!employee) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+    return res.json({ employee, message: 'Employee updated successfully' });
+  } catch (error) {
+    console.error('Update employee error:', error);
+    const message = error instanceof Error ? error.message : 'Failed to update employee';
+    return res.status(500).json({ error: message });
+  }
+}
+
+export async function deleteEmployeeController(req, res) {
+  try {
+    const { employeeNumber } = req.params;
+    const employee = await deleteEmployee(employeeNumber);
+    if (!employee) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+    return res.json({ message: 'Employee deleted successfully' });
+  } catch (error) {
+    console.error('Delete employee error:', error);
+    return res.status(500).json({ error: 'Failed to delete employee' });
   }
 }

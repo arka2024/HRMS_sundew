@@ -9,6 +9,9 @@ import { authRouter } from './routes/auth.routes.js';
 import { probationRouter } from './routes/probation.routes.js';
 import { managerRouter } from './routes/manager.routes.js';
 import { evaluationRouter } from './routes/evaluation.routes.js';
+import { probationExtensionRouter } from './routes/probation-extension.routes.js';
+import { evaluationUnlockRequestRouter } from './routes/evaluation-unlock-request.routes.js';
+import { associateManagerMappingRouter } from './routes/associate-manager-mapping.routes.js';
 import { ensureDummyManager } from './repositories/manager.repository.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -24,6 +27,9 @@ app.use('/api', authRouter);
 app.use('/api', probationRouter);
 app.use('/api', managerRouter);
 app.use('/api', evaluationRouter);
+app.use('/api', probationExtensionRouter);
+app.use('/api', evaluationUnlockRequestRouter);
+app.use('/api', associateManagerMappingRouter);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 

@@ -1,5 +1,12 @@
 import mongoose from 'mongoose';
 
+const lockUnlockHistorySchema = new mongoose.Schema({
+  action: { type: String, enum: ['lock', 'unlock'], required: true },
+  doneBy: { type: String, required: true },
+  date: { type: Date, required: true },
+  reason: { type: String, default: null },
+});
+
 const evaluationSchema = new mongoose.Schema(
   {
     employeeId: { type: String, required: true },
@@ -27,6 +34,7 @@ const evaluationSchema = new mongoose.Schema(
     lockedBy: { type: String, default: null },
     lockedDate: { type: Date, default: null },
     evaluationPeriod: { type: String, default: null },
+    lockUnlockHistory: [lockUnlockHistorySchema],
   },
   { timestamps: true }
 );

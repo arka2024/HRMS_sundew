@@ -9,7 +9,9 @@ import { LoadingSpinner } from '../../components/LoadingSpinner';
 import { PageHeader } from '../../components/PageHeader';
 import { ServiceError } from '../../components/ServiceError';
 import { useAuth } from '../../contexts/AuthContext';
-import { evaluationReportService, type EvaluationReport, type EvaluationDashboardStats } from '../../services/evaluation-report.service';
+import { evaluationReportService } from '../../services/evaluation-report.service';
+import type { EvaluationReport } from '../../types';
+import type { EvaluationDashboardStats } from '../../services/evaluation-report.service';
 
 export function EvaluationReportsPage() {
   const { token } = useAuth();
@@ -19,6 +21,8 @@ export function EvaluationReportsPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [departments, setDepartments] = useState<string[]>([]);
   const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
@@ -28,10 +32,19 @@ export function EvaluationReportsPage() {
     setError(null);
 
     try {
+      // Load departments
+      try {
+        const deptData = await evaluationReportService.getDistinctDepartments(token!);
+        setDepartments(deptData.departments);
+      } catch (err) {
+        console.error('Failed to load departments:', err);
+      }
+
       // Load dashboard stats with filters
       try {
         const filters: any = {};
         if (selectedPeriod !== 'all') filters.period = selectedPeriod;
+        if (selectedDepartment !== 'all') filters.department = selectedDepartment;
         if (selectedMonths.length > 0) filters.months = selectedMonths.join(',');
         if (customStartDate && customEndDate) {
           filters.startDate = customStartDate;
@@ -50,6 +63,7 @@ export function EvaluationReportsPage() {
         const filters: any = {};
         if (selectedPeriod !== 'all') filters.period = selectedPeriod;
         if (selectedStatus !== 'all') filters.status = selectedStatus;
+        if (selectedDepartment !== 'all') filters.department = selectedDepartment;
         if (selectedMonths.length > 0) filters.months = selectedMonths.join(',');
         if (customStartDate && customEndDate) {
           filters.startDate = customStartDate;
@@ -71,7 +85,7 @@ export function EvaluationReportsPage() {
     if (token) {
       loadData();
     }
-  }, [token, selectedPeriod, selectedStatus, selectedMonths, customStartDate, customEndDate]);
+  }, [token, selectedPeriod, selectedStatus, selectedDepartment, selectedMonths, customStartDate, customEndDate]);
 
   function handleExportPDF() {
     evaluationReportService.exportPDF(token!)
@@ -145,6 +159,11 @@ export function EvaluationReportsPage() {
     { id: 'In Review', label: 'In Review' },
     { id: 'Completed', label: 'Completed' },
     { id: 'Locked', label: 'Locked' },
+  ];
+
+  const DEPARTMENT_FILTERS = [
+    { id: 'all', label: 'All Departments' },
+    ...departments.map(dept => ({ id: dept, label: dept }))
   ];
 
   const MONTH_OPTIONS = [
@@ -290,6 +309,19 @@ export function EvaluationReportsPage() {
                 {filter.label}
               </button>
             ))}
+          </div>
+          <div className="date-filters">
+            <select
+              value={selectedDepartment}
+              onChange={(e) => setSelectedDepartment(e.target.value)}
+              className="filter-select"
+            >
+              {DEPARTMENT_FILTERS.map((filter) => (
+                <option key={filter.id} value={filter.id}>
+                  {filter.label}
+                </option>
+              ))}
+            </select>
           </div>
           {selectedPeriod === 'custom' && (
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginLeft: '16px' }}>

@@ -167,7 +167,7 @@ export function HrDashboardPage() {
               <div className="stat-label">Pending</div>
             </div>
             <div className="stat-item">
-              <div className="stat-value">{evaluationStats?.lockedEvaluationCycles || 0}</div>
+              <div className="stat-value">{evaluationStats?.lockedEvaluations || 0}</div>
               <div className="stat-label">Locked Cycles</div>
             </div>
             <div className="stat-item">

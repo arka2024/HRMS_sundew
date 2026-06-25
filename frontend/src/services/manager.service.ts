@@ -6,6 +6,7 @@ export interface Associate {
   id: string;
   name: string;
   employeeId: string;
+  employeeNumber: string;
   joinDate: string;
   manager: string;
   probation: string;

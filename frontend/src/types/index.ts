@@ -7,17 +7,33 @@ export interface User {
   role: UserRole;
 }
 
+export interface Manager {
+  _id?: string;
+  managerId: string;
+  managerName: string;
+  email: string;
+  department: string;
+  status: 'Active' | 'Inactive';
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface AuthResponse {
   user: User;
   token: string;
 }
 
 export interface Employee {
-  id: string;
-  name: string;
+  _id?: string;
+  employeeNumber: string;
+  employeeName: string;
+  dateOfJoining: string;
+  totalHours: number;
   department: string;
-  position: string;
-  status: string;
+  projectName: string;
+  managerId: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface TeamMember {
@@ -101,4 +117,85 @@ export interface AssociateTaskSyncResponse {
     employeeId: string;
     reason: string;
   }>;
+}
+
+// New types for our features!
+export interface ProbationExtension {
+  _id?: string;
+  employeeNumber: string;
+  employeeName: string;
+  durationMonths: number;
+  reason: string;
+  requestedBy: string;
+  requestedDate: string;
+  managerApproved?: boolean;
+  managerApprovedBy?: string;
+  managerApprovedDate?: string;
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Completed';
+  approvedBy?: string;
+  approvedDate?: string;
+  rejectionReason?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface EvaluationUnlockRequest {
+  _id?: string;
+  employeeNumber: string;
+  employeeName: string;
+  evaluationYear: string;
+  evaluationMonth: string;
+  reason: string;
+  requestedBy: string;
+  requestedDate: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  approvedBy?: string;
+  approvedDate?: string;
+  rejectionReason?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AssociateManagerMapping {
+  _id?: string;
+  associateEmployeeNumber: string;
+  associateName: string;
+  managerEmployeeNumber: string;
+  managerName: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface LockUnlockHistory {
+  action: 'lock' | 'unlock';
+  doneBy: string;
+  date: string;
+  reason?: string;
+}
+
+// Updated Evaluation Report interface
+export interface EvaluationReport {
+  employeeId: string;
+  employeeNumber: string;
+  employeeName: string;
+  department: string;
+  project: string;
+  managerId: string;
+  evaluationMonth: string;
+  evaluationYear: string;
+  performanceScore: number;
+  attendanceScore: number;
+  productivityScore: number;
+  communicationScore: number;
+  learningScore: number;
+  collaborationScore: number;
+  overallScore: number;
+  rating?: string;
+  hrRemarks?: string;
+  status: string;
+  lockedBy?: string;
+  lockedDate?: string;
+  lockUnlockHistory: LockUnlockHistory[];
+  savedAt?: string;
 }

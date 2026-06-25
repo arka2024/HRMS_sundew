@@ -1,26 +1,5 @@
 import { apiRequest, API_URLS } from './api.client';
-
-export interface EvaluationReport {
-  employeeId: string;
-  employeeName: string;
-  department: string;
-  project: string;
-  managerId: string;
-  evaluationMonth: string;
-  evaluationYear: string;
-  performanceScore: number;
-  attendanceScore: number;
-  productivityScore: number;
-  communicationScore: number;
-  learningScore: number;
-  collaborationScore: number;
-  overallScore: number;
-  hrRemarks: string;
-  status: 'Draft' | 'Completed' | 'Locked';
-  lockedBy: string | null;
-  lockedDate: string | null;
-  savedAt: string;
-}
+import type { EvaluationReport, EvaluationUnlockRequest, ProbationExtension, AssociateManagerMapping } from '../types';
 
 export interface EvaluationDashboardStats {
   totalEvaluatedEmployees: number;
@@ -80,6 +59,14 @@ export interface EmployeeReportResponse {
 
 export class EvaluationReportService {
   private readonly baseUrl = '/api/evaluation-reports';
+
+  async getDistinctDepartments(token: string): Promise<{ departments: string[] }> {
+    return apiRequest<{ departments: string[] }>(
+      API_URLS.PROBATION,
+      '/api/departments',
+      { token }
+    );
+  }
 
   async getDashboardStats(token: string, filters?: {
     period?: string;
@@ -161,24 +148,22 @@ export class EvaluationReportService {
 
   async lockEvaluation(token: string, employeeId: string, monthKey: string): Promise<{ message: string; evaluation: any }> {
     return apiRequest<{ message: string; evaluation: any }>(
-      API_URLS.MANAGER,
-      `${this.baseUrl}/${employeeId}/lock`,
+      API_URLS.PROBATION,
+      `${this.baseUrl}/lock/${employeeId}/${monthKey}`,
       { 
         token,
         method: 'POST',
-        body: JSON.stringify({ monthKey, lock: true }),
       },
     );
   }
 
   async unlockEvaluation(token: string, employeeId: string, monthKey: string): Promise<{ message: string; evaluation: any }> {
     return apiRequest<{ message: string; evaluation: any }>(
-      API_URLS.MANAGER,
-      `${this.baseUrl}/${employeeId}/lock`,
+      API_URLS.PROBATION,
+      `${this.baseUrl}/unlock/${employeeId}/${monthKey}`,
       { 
         token,
         method: 'POST',
-        body: JSON.stringify({ monthKey, lock: false }),
       },
     );
   }
@@ -229,6 +214,150 @@ export class EvaluationReportService {
         token,
         method: 'POST',
       },
+    );
+  }
+
+  // Evaluation Unlock Request Methods
+  async createEvaluationUnlockRequest(token: string, data: Omit<EvaluationUnlockRequest, '_id' | 'requestedDate' | 'status' | 'approvedBy' | 'approvedDate' | 'rejectionReason' | 'createdAt' | 'updatedAt'>) {
+    return apiRequest<{ message: string; request: EvaluationUnlockRequest }>(
+      API_URLS.PROBATION,
+      '/api/evaluation-unlock-requests',
+      {
+        token,
+        method: 'POST',
+        body: JSON.stringify(data),
+      }
+    );
+  }
+
+  async getEvaluationUnlockRequests(token: string, filters?: { employeeNumber?: string; status?: string }) {
+    const params = new URLSearchParams();
+    if (filters?.employeeNumber) params.append('employeeNumber', filters.employeeNumber);
+    if (filters?.status) params.append('status', filters.status);
+    const url = params.toString() ? `/api/evaluation-unlock-requests?${params.toString()}` : '/api/evaluation-unlock-requests';
+    return apiRequest<{ requests: EvaluationUnlockRequest[] }>(API_URLS.PROBATION, url, { token });
+  }
+
+  async approveEvaluationUnlockRequest(token: string, id: string) {
+    return apiRequest<{ message: string; request: EvaluationUnlockRequest }>(
+      API_URLS.PROBATION,
+      `/api/evaluation-unlock-requests/${id}/approve`,
+      {
+        token,
+        method: 'POST'
+      }
+    );
+  }
+
+  async rejectEvaluationUnlockRequest(token: string, id: string, rejectionReason: string) {
+    return apiRequest<{ message: string; request: EvaluationUnlockRequest }>(
+      API_URLS.PROBATION,
+      `/api/evaluation-unlock-requests/${id}/reject`,
+      {
+        token,
+        method: 'POST',
+        body: JSON.stringify({ rejectionReason })
+      }
+    );
+  }
+
+  // Probation Extension Methods
+  async createProbationExtension(token: string, data: Omit<ProbationExtension, '_id' | 'requestedDate' | 'managerApproved' | 'managerApprovedBy' | 'managerApprovedDate' | 'status' | 'approvedBy' | 'approvedDate' | 'rejectionReason' | 'createdAt' | 'updatedAt'>) {
+    return apiRequest<{ message: string; extension: ProbationExtension }>(
+      API_URLS.PROBATION,
+      '/api/probation-extensions',
+      {
+        token,
+        method: 'POST',
+        body: JSON.stringify(data)
+      }
+    );
+  }
+
+  async getProbationExtensions(token: string, filters?: { employeeNumber?: string; status?: string }) {
+    const params = new URLSearchParams();
+    if (filters?.employeeNumber) params.append('employeeNumber', filters.employeeNumber);
+    if (filters?.status) params.append('status', filters.status);
+    const url = params.toString() ? `/api/probation-extensions?${params.toString()}` : '/api/probation-extensions';
+    return apiRequest<{ extensions: ProbationExtension[] }>(API_URLS.PROBATION, url, { token });
+  }
+
+  async approveProbationExtensionByManager(token: string, id: string) {
+    return apiRequest<{ message: string; extension: ProbationExtension }>(
+      API_URLS.PROBATION,
+      `/api/probation-extensions/${id}/manager-approve`,
+      {
+        token,
+        method: 'POST'
+      }
+    );
+  }
+
+  async approveProbationExtension(token: string, id: string) {
+    return apiRequest<{ message: string; extension: ProbationExtension }>(
+      API_URLS.PROBATION,
+      `/api/probation-extensions/${id}/approve`,
+      {
+        token,
+        method: 'POST'
+      }
+    );
+  }
+
+  async rejectProbationExtension(token: string, id: string, rejectionReason: string) {
+    return apiRequest<{ message: string; extension: ProbationExtension }>(
+      API_URLS.PROBATION,
+      `/api/probation-extensions/${id}/reject`,
+      {
+        token,
+        method: 'POST',
+        body: JSON.stringify({ rejectionReason })
+      }
+    );
+  }
+
+  // Associate Manager Mapping Methods
+  async createAssociateManagerMapping(token: string, data: Omit<AssociateManagerMapping, '_id' | 'isActive' | 'createdAt' | 'updatedAt'>) {
+    return apiRequest<{ message: string; mapping: AssociateManagerMapping }>(
+      API_URLS.PROBATION,
+      '/api/associate-manager-mappings',
+      {
+        token,
+        method: 'POST',
+        body: JSON.stringify(data)
+      }
+    );
+  }
+
+  async getAssociateManagerMappings(token: string, filters?: { associateEmployeeNumber?: string; managerEmployeeNumber?: string; isActive?: boolean }) {
+    const params = new URLSearchParams();
+    if (filters?.associateEmployeeNumber) params.append('associateEmployeeNumber', filters.associateEmployeeNumber);
+    if (filters?.managerEmployeeNumber) params.append('managerEmployeeNumber', filters.managerEmployeeNumber);
+    if (filters?.isActive !== undefined) params.append('isActive', String(filters.isActive));
+    const url = params.toString() ? `/api/associate-manager-mappings?${params.toString()}` : '/api/associate-manager-mappings';
+    return apiRequest<{ mappings: AssociateManagerMapping[] }>(API_URLS.PROBATION, url, { token });
+  }
+
+  async updateAssociateManagerMapping(token: string, id: string, data: Partial<AssociateManagerMapping>) {
+    return apiRequest<{ message: string; mapping: AssociateManagerMapping }>(
+      API_URLS.PROBATION,
+      `/api/associate-manager-mappings/${id}`,
+      {
+        token,
+        method: 'PUT',
+        body: JSON.stringify(data)
+      }
+    );
+  }
+
+  async deactivateAssociateManagerMapping(token: string, id: string) {
+    return apiRequest<{ message: string; mapping: AssociateManagerMapping }>(
+      API_URLS.PROBATION,
+      `/api/associate-manager-mappings/${id}/deactivate`,
+      {
+        token,
+        method: 'POST'
+      }
     );
   }
 }

@@ -10,11 +10,13 @@ import {
   unlockEvaluationController,
   exportExcelController,
   seedEvaluationsController,
-  exportPDFController
+  exportPDFController,
+  getDistinctDepartmentsController
 } from '../controllers/evaluation.controller.js';
 
 export const evaluationRouter = express.Router();
 
+evaluationRouter.get('/departments', requireAuth, getDistinctDepartmentsController);
 evaluationRouter.get('/evaluation-reports', requireAuth, getEvaluationsController);
 evaluationRouter.get('/evaluation-reports/dashboard', requireAuth, getDashboardStatsController);
 evaluationRouter.get('/evaluation-reports/:employeeId', requireAuth, getEmployeeReportController);

@@ -89,8 +89,14 @@ export function AppShell() {
   const topNavLinks = isHrPortal
     ? [
         { to: ROUTES.HR.DASHBOARD, label: 'Dashboard' },
+        { to: ROUTES.HR.ASSOCIATES, label: 'Associates' },
+        { to: ROUTES.HR.ASSOCIATE_MANAGER_MAPPINGS, label: 'Mappings' },
         { to: ROUTES.HR.EMPLOYEE_UPLOAD, label: 'Upload' },
         { to: ROUTES.HR.EMPLOYEES, label: 'Team' },
+        { to: ROUTES.HR.EVALUATION_REPORTS, label: 'Evaluation Reports' },
+        { to: ROUTES.HR.MANAGERS, label: 'Managers' },
+        { to: ROUTES.HR.PROBATION_EXTENSIONS, label: 'Probation Extensions' },
+        { to: ROUTES.HR.EVALUATION_UNLOCK_REQUESTS, label: 'Unlock Requests' },
         { to: ROUTES.HR.REPORTS, label: 'Reports' },
       ]
     : [
@@ -98,6 +104,9 @@ export function AppShell() {
         { to: ROUTES.MANAGER.EMPLOYEES, label: 'Employees' },
         { to: ROUTES.MANAGER.TEAM, label: 'Team' },
         { to: ROUTES.MANAGER.EVALUATIONS, label: 'Evaluations' },
+        { to: ROUTES.MANAGER.PROBATION_EXTENSIONS, label: 'Probation Extensions' },
+        { to: ROUTES.MANAGER.EVALUATION_UNLOCK_REQUESTS, label: 'Unlock Requests' },
+        { to: ROUTES.MANAGER.EVALUATION_REPORTS, label: 'Reports' },
       ];
 
   return (
@@ -131,11 +140,60 @@ export function AppShell() {
                   Files
                 </NavLink>
                 <NavLink
+                  to={ROUTES.HR.ASSOCIATES}
+                  className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+                >
+                  <span className="material-symbols-outlined">group_add</span>
+                  Associates
+                </NavLink>
+                <NavLink
+                  to={ROUTES.HR.ASSOCIATE_MANAGER_MAPPINGS}
+                  className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+                >
+                  <span className="material-symbols-outlined">swap_horiz</span>
+                  Mappings
+                </NavLink>
+                <NavLink
                   to={ROUTES.HR.EMPLOYEE_UPLOAD}
                   className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
                 >
                   <span className="material-symbols-outlined">upload_file</span>
                   Employee Upload
+                </NavLink>
+                <NavLink
+                  to={ROUTES.HR.EMPLOYEES}
+                  className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+                >
+                  <span className="material-symbols-outlined">group</span>
+                  Employees
+                </NavLink>
+                <NavLink
+                  to={ROUTES.HR.EVALUATION_REPORTS}
+                  className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+                >
+                  <span className="material-symbols-outlined">assessment</span>
+                  Evaluation Reports
+                </NavLink>
+                <NavLink
+                  to={ROUTES.HR.MANAGERS}
+                  className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+                >
+                  <span className="material-symbols-outlined">supervisor_account</span>
+                  Managers
+                </NavLink>
+                <NavLink
+                  to={ROUTES.HR.PROBATION_EXTENSIONS}
+                  className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+                >
+                  <span className="material-symbols-outlined">schedule</span>
+                  Probation Extensions
+                </NavLink>
+                <NavLink
+                  to={ROUTES.HR.EVALUATION_UNLOCK_REQUESTS}
+                  className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+                >
+                  <span className="material-symbols-outlined">lock_open</span>
+                  Unlock Requests
                 </NavLink>
                 <button
                   type="button"

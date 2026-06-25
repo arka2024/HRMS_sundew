@@ -9,10 +9,16 @@ export const ROUTES = {
   DASHBOARD: '/dashboard',
   HR: {
     DASHBOARD: '/hr/dashboard',
+    ASSOCIATES: '/hr/associates',
     ASSOCIATE_UPLOAD: '/hr/associate-upload',
     EMPLOYEE_UPLOAD: '/hr/employees/upload',
     EMPLOYEES: '/hr/employees',
     REPORTS: '/hr/reports',
+    EVALUATION_REPORTS: '/hr/evaluation-reports',
+    MANAGERS: '/hr/managers',
+    PROBATION_EXTENSIONS: '/hr/probation-extensions',
+    EVALUATION_UNLOCK_REQUESTS: '/hr/evaluation-unlock-requests',
+    ASSOCIATE_MANAGER_MAPPINGS: '/hr/associate-manager-mappings',
   },
   MANAGER: {
     DASHBOARD: '/manager/dashboard',
@@ -20,6 +26,9 @@ export const ROUTES = {
     EMPLOYEES: '/manager/employees',
     TEAM: '/manager/team',
     EVALUATIONS: '/manager/evaluations',
+    EVALUATION_REPORTS: '/manager/evaluation-reports',
+    PROBATION_EXTENSIONS: '/manager/probation-extensions',
+    EVALUATION_UNLOCK_REQUESTS: '/manager/evaluation-unlock-requests',
   },
 };
 
